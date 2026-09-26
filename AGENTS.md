@@ -1,0 +1,2 @@
+- CMS content lives in Cloud tables (pages, content_blocks, dropoffs, volunteer_needs, donation_methods, messages) with `_en`/`_es` columns; read via `useRows`/`useBlocks` in src/lib/cms.ts — keeps EN/ES in one page, editable from /admin.
+- First user to sign up becomes admin (trigger on auth.users); writes gated by `has_role(auth.uid(),'admin')` RLS.
