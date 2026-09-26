@@ -216,7 +216,8 @@ function AdminItem({
   onDelete: () => void;
 }) {
   const { t } = useLang();
-  const isEditing = editing === (item.key || item.id);
+  const itemKey = item.key || item.id;
+  const isEditing = editing === itemKey || (editing === "new" && itemKey === editData?.id);
   const data = isEditing ? editData : item;
 
   const renderFields = () => {
