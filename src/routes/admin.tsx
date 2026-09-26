@@ -1,12 +1,15 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState } from "react";
-import { Lock, LogOut, Eye, EyeOff, Pencil, Trash2, Plus, Save, X, Image, ArrowUpDown } from "lucide-react";
+import { Lock, LogOut, Eye, EyeOff, Pencil, Trash2, Plus, Save, X, Image, ArrowUpDown, Copy, ExternalLink } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { contentBlocks, pages, dropoffs, volunteerNeeds, donationMethods, type PageRow } from "@/lib/cms";
 import { WhatsAppButton, LegalLinks } from "@/components/SiteExtras";
 import { SiteLayout } from "@/components/SiteLayout";
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "boladmin2024";
+
+// Transform contentBlocks object to array of objects with key property
+const contentBlocksArray = Object.entries(contentBlocks).map(([key, val]) => ({ key, ...val }));
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLang();
@@ -71,7 +74,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
         </button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <AdminSection title={t("Content Blocks", "Bloques de Contenido")} icon={Image} items={Object.entries(contentBlocks)} type="blocks" />
+        <AdminSection title={t("Content Blocks", "Bloques de Contenido")} icon={Image} items={contentBlocksArray} type="blocks" />
         <AdminSection title={t("Pages", "Páginas")} icon={Pencil} items={pages} type="pages" />
         <AdminSection title={t("Drop-off Points", "Puntos de Entrega")} icon={Image} items={dropoffs} type="dropoffs" />
         <AdminSection title={t("Volunteer Needs", "Necesidades de Voluntariado")} icon={Pencil} items={volunteerNeeds} type="volunteer" />
@@ -96,6 +99,24 @@ function AdminSection({
   const [editing, setEditing] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>(null);
 
+  // Default values for new items by type
+  const getDefaultItem = (type: string) => {
+    switch (type) {
+      case "blocks":
+        return { key: "", en: "", es: "" };
+      case "pages":
+        return { id: `page-${Date.now()}`, slug: "", label_en: "", label_es: "", title_en: "", title_es: "", body_en: "", body_es: "", image: "", sort_order: 0, visible: true, is_system: false };
+      case "dropoffs":
+        return { id: `dropoff-${Date.now()}`, name: "", address: "", hours_en: "", hours_es: "", phone: "", map_url: "", image: "", sort_order: 0, visible: true };
+      case "volunteer":
+        return { id: `volunteer-${Date.now()}`, title_en: "", title_es: "", desc_en: "", desc_es: "", image: "", sort_order: 0, visible: true };
+      case "donations":
+        return { id: `donation-${Date.now()}`, name_en: "", name_es: "", details_en: "", details_es: "", link: "", image: "", sort_order: 0, visible: true };
+      default:
+        return {};
+    }
+  };
+
   return (
     <div className="rounded-2xl border bg-card p-6">
       <div className="flex items-center justify-between mb-4">
@@ -104,7 +125,10 @@ function AdminSection({
           {title}
         </h2>
         <button
-          onClick={() => setEditing("new")}
+          onClick={() => {
+            setEditData(getDefaultItem(type));
+            setEditing("new");
+          }}
           className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent"
         >
           <Plus className="h-4 w-4" />
@@ -121,6 +145,11 @@ function AdminSection({
             onEdit={(item) => {
               setEditData({ ...item });
               setEditing(item.key || item.id);
+            }}
+            onClone={(item) => {
+              const cloned = { ...item, id: `${item.id || item.key}-copy-${Date.now()}`, slug: item.slug ? `${item.slug}-copy` : undefined };
+              setEditData(cloned);
+              setEditing(cloned.key || cloned.id);
             }}
             onSave={(updated) => {
               console.log(`${type} save:`, updated);
@@ -142,7 +171,7 @@ function AdminSection({
         ))}
         {editing === "new" && (
           <AdminItem
-            item={{}}
+            item={getDefaultItem(type)}
             type={type}
             editing="new"
             editData={editData}
@@ -171,6 +200,7 @@ function AdminItem({
   editing,
   editData,
   onEdit,
+  onClone,
   onSave,
   onCancel,
   onDelete,
@@ -180,6 +210,7 @@ function AdminItem({
   editing: string | null;
   editData: any;
   onEdit: (item: any) => void;
+  onClone: (item: any) => void;
   onSave: (updated: any) => void;
   onCancel: () => void;
   onDelete: () => void;
@@ -544,16 +575,31 @@ function AdminItem({
 
   return (
     <div className="flex items-start justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition">
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-primary truncate">{displayTitle}</p>
-        {data.en && <p className="text-xs text-muted-foreground truncate">{data.en}</p>}
-        {data.es && <p className="text-xs text-muted-foreground truncate">{data.es}</p>}
-        {data.title_en && <p className="text-xs text-muted-foreground truncate">{data.title_en}</p>}
-        {data.name && <p className="text-xs text-muted-foreground truncate">{data.name}</p>}
-        {data.address && <p className="text-xs text-muted-foreground truncate">{data.address}</p>}
-        {data.hours_en && <p className="text-xs text-muted-foreground truncate">{data.hours_en}</p>}
+      <div className="flex items-start gap-3 min-w-0">
+        {data.image && (
+          <img
+            src={data.image}
+            alt=""
+            className="h-12 w-12 shrink-0 rounded-lg object-cover border"
+          />
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-primary truncate">{displayTitle}</p>
+          {data.en && <p className="text-xs text-muted-foreground truncate">{data.en}</p>}
+          {data.es && <p className="text-xs text-muted-foreground truncate">{data.es}</p>}
+          {data.title_en && <p className="text-xs text-muted-foreground truncate">{data.title_en}</p>}
+          {data.name && <p className="text-xs text-muted-foreground truncate">{data.name}</p>}
+          {data.address && <p className="text-xs text-muted-foreground truncate">{data.address}</p>}
+          {data.hours_en && <p className="text-xs text-muted-foreground truncate">{data.hours_en}</p>}
+          {data.details_en && <p className="text-xs text-muted-foreground truncate line-clamp-1">{data.details_en}</p>}
+          {data.desc_en && <p className="text-xs text-muted-foreground truncate line-clamp-1">{data.desc_en}</p>}
+          {data.label_en && <p className="text-xs text-muted-foreground truncate">{data.label_en}</p>}
+        </div>
       </div>
       <div className="flex items-center gap-1">
+        <button onClick={() => onClone(item)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title={t("Clone", "Clonar")}>
+          <Copy className="h-4 w-4" />
+        </button>
         <button onClick={() => onEdit(item)} className="p-1.5 hover:bg-accent rounded" title={t("Edit", "Editar")}>
           <Pencil className="h-4 w-4" />
         </button>
