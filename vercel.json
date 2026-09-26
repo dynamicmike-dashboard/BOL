@@ -6,7 +6,7 @@
   "functions": {
     "api/server.js": {
       "maxDuration": 30,
-      "runtime": "nodejs22.x"
+      "runtime": "nodejs22"
     }
   },
   "rewrites": [
