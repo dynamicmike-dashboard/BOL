@@ -220,32 +220,25 @@ function AdminSection({ title, icon: Icon, items, type }: { title: string; icon:
       </div>
       <div className="space-y-3 max-h-[500px] overflow-y-auto">
         {items.map((item) => (
-          <AdminItem key={item.key || item.id} item={item} type={type} editingKey={editingKey} editData={editData} onEdit={startEdit} onClone={startClone} onSave={handleSave} onCancel={handleCancel} onDelete={() => { if (confirm(t("Delete this item?", "¿Eliminar este elemento?"))) { console.log(`${type} delete:`, item.key || item.id); alert(`${title} deleted: ${item.key || item.id}`); } }} />
+          <AdminItem key={item.key || item.id} item={item} type={type} editingKey={editingKey} editData={editData} setEditData={setEditData} onEdit={startEdit} onClone={startClone} onSave={handleSave} onCancel={handleCancel} onDelete={() => { if (confirm(t("Delete this item?", "¿Eliminar este elemento?"))) { console.log(`${type} delete:`, item.key || item.id); alert(`${title} deleted: ${item.key || item.id}`); } }} />
         ))}
         {editingKey === "new" && (
-          <AdminItem item={newItemDefaults} type={type} editingKey="new" editData={editData} onEdit={() => {}} onSave={(updated) => { console.log(`${type} create:`, updated); alert(`${title} created: ${JSON.stringify(updated)}`); setEditingKey(null); setEditData(null); setNewItemDefaults(null); }} onCancel={() => { setEditingKey(null); setEditData(null); setNewItemDefaults(null); }} onDelete={() => {}} />
+          <AdminItem item={newItemDefaults} type={type} editingKey="new" editData={editData} setEditData={setEditData} onEdit={() => {}} onSave={(updated) => { console.log(`${type} create:`, updated); alert(`${title} created: ${JSON.stringify(updated)}`); setEditingKey(null); setEditData(null); setNewItemDefaults(null); }} onCancel={() => { setEditingKey(null); setEditData(null); setNewItemDefaults(null); }} onDelete={() => {}} />
         )}
       </div>
     </div>
   );
 }
 
-function AdminItem({ item, type, editingKey, editData, onEdit, onClone, onSave, onCancel, onDelete }: { item: any; type: string; editingKey: string | null; editData: any; onEdit: (item: any) => void; onClone: (item: any) => void; onSave: (updated: any) => void; onCancel: () => void; onDelete: () => void }) {
+function AdminItem({ item, type, editingKey, editData, setEditData, onEdit, onClone, onSave, onCancel, onDelete }: { item: any; type: string; editingKey: string | null; editData: any; setEditData: (updater: (prev: any) => any) => void; onEdit: (item: any) => void; onClone: (item: any) => void; onSave: (updated: any) => void; onCancel: () => void; onDelete: () => void }) {
   const { t } = useLang();
   const itemKey = item.key || item.id;
   const isEditing = editingKey === itemKey || (editingKey === "new" && item.id === editData?.id);
   const data = isEditing ? editData : item;
 
-  const update = (field: string, value: any) => editData && setEditData(d => ({ ...d, [field]: value }));
-  // We need to access setEditData from parent - pass it as prop or use context
-  // For now, use the editData reference directly
+  const update = (field: string, value: any) => setEditData(d => ({ ...d, [field]: value }));
 
   const renderFields = () => {
-    const updateField = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value = e.target.type === "checkbox" ? e.target.checked : e.target.type === "number" ? parseInt(e.target.value) || 0 : e.target.value;
-      setEditData(d => ({ ...d, [field]: value }));
-    };
-
     const TextArea = ({ value, onChange, placeholder, rows = 6 }: any) => (
       <div className="space-y-1">
         <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={rows} className="w-full rounded-lg border bg-background px-3 py-2 text-sm font-mono text-xs" />
