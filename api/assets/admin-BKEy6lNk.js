@@ -1,0 +1,541 @@
+import { n as useLang } from "./i18n-BoG3AB_M.js";
+import { d as dropoffs, f as pages, l as contentBlocks, n as SiteLayout, p as volunteerNeeds, u as donationMethods } from "./SiteLayout-D-SBicl5.js";
+import { useState } from "react";
+import { jsx, jsxs } from "react/jsx-runtime";
+import { Eye, EyeOff, Image, LogOut, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+//#region src/routes/admin.tsx?tsr-split=component
+var ADMIN_PASSWORD = "boladmin2024";
+function AdminLayout({ children }) {
+	const { t } = useLang();
+	const [authed, setAuthed] = useState(false);
+	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+	if (!authed) {
+		return /* @__PURE__ */ jsx(SiteLayout, { children: /* @__PURE__ */ jsx("div", {
+			className: "flex min-h-[60vh] items-center justify-center px-4",
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "w-full max-w-md rounded-3xl border bg-card p-8 shadow-lg",
+				children: [
+					/* @__PURE__ */ jsx("h1", {
+						className: "text-center text-2xl font-semibold text-primary mb-6",
+						children: t("Admin Login", "Acceso Admin")
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "relative",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: showPassword ? "text" : "password",
+							value: password,
+							onChange: (e) => setPassword(e.target.value),
+							onKeyDown: (e) => e.key === "Enter" && handleLogin(),
+							placeholder: t("Password", "Contraseña"),
+							className: "w-full rounded-lg border bg-background px-4 py-3 pr-12 text-lg"
+						}), /* @__PURE__ */ jsx("button", {
+							onClick: () => setShowPassword(!showPassword),
+							className: "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground",
+							children: showPassword ? /* @__PURE__ */ jsx(EyeOff, { className: "h-5 w-5" }) : /* @__PURE__ */ jsx(Eye, { className: "h-5 w-5" })
+						})]
+					}),
+					/* @__PURE__ */ jsx("button", {
+						onClick: handleLogin,
+						className: "mt-4 w-full rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90",
+						children: t("Login", "Entrar")
+					})
+				]
+			})
+		}) });
+		function handleLogin() {
+			if (password === ADMIN_PASSWORD) setAuthed(true);
+			else alert(t("Incorrect password", "Contraseña incorrecta"));
+		}
+	}
+	return /* @__PURE__ */ jsxs(SiteLayout, { children: [/* @__PURE__ */ jsxs("div", {
+		className: "mb-4 flex items-center justify-between",
+		children: [/* @__PURE__ */ jsx("h1", {
+			className: "text-2xl font-semibold text-primary",
+			children: t("Admin Panel", "Panel de Admin")
+		}), /* @__PURE__ */ jsxs("button", {
+			onClick: () => setAuthed(false),
+			className: "flex items-center gap-2 rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent",
+			children: [/* @__PURE__ */ jsx(LogOut, { className: "h-4 w-4" }), t("Logout", "Salir")]
+		})]
+	}), /* @__PURE__ */ jsxs("div", {
+		className: "grid gap-6 md:grid-cols-2 lg:grid-cols-3",
+		children: [
+			/* @__PURE__ */ jsx(AdminSection, {
+				title: t("Content Blocks", "Bloques de Contenido"),
+				icon: Image,
+				items: Object.entries(contentBlocks),
+				type: "blocks"
+			}),
+			/* @__PURE__ */ jsx(AdminSection, {
+				title: t("Pages", "Páginas"),
+				icon: Pencil,
+				items: pages,
+				type: "pages"
+			}),
+			/* @__PURE__ */ jsx(AdminSection, {
+				title: t("Drop-off Points", "Puntos de Entrega"),
+				icon: Image,
+				items: dropoffs,
+				type: "dropoffs"
+			}),
+			/* @__PURE__ */ jsx(AdminSection, {
+				title: t("Volunteer Needs", "Necesidades de Voluntariado"),
+				icon: Pencil,
+				items: volunteerNeeds,
+				type: "volunteer"
+			}),
+			/* @__PURE__ */ jsx(AdminSection, {
+				title: t("Donation Methods", "Métodos de Donación"),
+				icon: Image,
+				items: donationMethods,
+				type: "donations"
+			})
+		]
+	})] });
+}
+function AdminSection({ title, icon: Icon, items, type }) {
+	const { t } = useLang();
+	const [editing, setEditing] = useState(null);
+	const [editData, setEditData] = useState(null);
+	return /* @__PURE__ */ jsxs("div", {
+		className: "rounded-2xl border bg-card p-6",
+		children: [/* @__PURE__ */ jsxs("div", {
+			className: "flex items-center justify-between mb-4",
+			children: [/* @__PURE__ */ jsxs("h2", {
+				className: "flex items-center gap-2 text-lg font-semibold text-primary",
+				children: [/* @__PURE__ */ jsx(Icon, { className: "h-5 w-5" }), title]
+			}), /* @__PURE__ */ jsx("button", {
+				onClick: () => setEditing("new"),
+				className: "rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent",
+				children: /* @__PURE__ */ jsx(Plus, { className: "h-4 w-4" })
+			})]
+		}), /* @__PURE__ */ jsxs("div", {
+			className: "space-y-3 max-h-[500px] overflow-y-auto",
+			children: [items.map((item) => /* @__PURE__ */ jsx(AdminItem, {
+				item,
+				type,
+				editing,
+				editData,
+				onEdit: (item) => {
+					setEditData({ ...item });
+					setEditing(item.key || item.id);
+				},
+				onSave: (updated) => {
+					console.log(`${type} save:`, updated);
+					alert(`${title} saved: ${JSON.stringify(updated)}`);
+					setEditing(null);
+					setEditData(null);
+				},
+				onCancel: () => {
+					setEditing(null);
+					setEditData(null);
+				},
+				onDelete: () => {
+					if (confirm(t("Delete this item?", "¿Eliminar este elemento?"))) {
+						console.log(`${type} delete:`, item.key || item.id);
+						alert(`${title} deleted: ${item.key || item.id}`);
+					}
+				}
+			}, item.key || item.id)), editing === "new" && /* @__PURE__ */ jsx(AdminItem, {
+				item: {},
+				type,
+				editing: "new",
+				editData,
+				onEdit: () => {},
+				onSave: (updated) => {
+					console.log(`${type} create:`, updated);
+					alert(`${title} created: ${JSON.stringify(updated)}`);
+					setEditing(null);
+					setEditData(null);
+				},
+				onCancel: () => {
+					setEditing(null);
+					setEditData(null);
+				},
+				onDelete: () => {}
+			})]
+		})]
+	});
+}
+function AdminItem({ item, type, editing, editData, onEdit, onSave, onCancel, onDelete }) {
+	const { t } = useLang();
+	const isEditing = editing === (item.key || item.id);
+	const data = isEditing ? editData : item;
+	const renderFields = () => {
+		switch (type) {
+			case "blocks": return /* @__PURE__ */ jsxs("div", {
+				className: "grid gap-2",
+				children: [
+					/* @__PURE__ */ jsx("input", {
+						value: data.key || "",
+						onChange: (e) => setEditData({
+							...data,
+							key: e.target.value
+						}),
+						placeholder: "key",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.en || "",
+						onChange: (e) => setEditData({
+							...data,
+							en: e.target.value
+						}),
+						placeholder: "English",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.es || "",
+						onChange: (e) => setEditData({
+							...data,
+							es: e.target.value
+						}),
+						placeholder: "Español",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					})
+				]
+			});
+			case "pages": return /* @__PURE__ */ jsxs("div", {
+				className: "grid gap-2",
+				children: [
+					/* @__PURE__ */ jsx("input", {
+						value: data.slug || "",
+						onChange: (e) => setEditData({
+							...data,
+							slug: e.target.value
+						}),
+						placeholder: "slug",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.label_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							label_en: e.target.value
+						}),
+						placeholder: "Label EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.label_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							label_es: e.target.value
+						}),
+						placeholder: "Label ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.title_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							title_en: e.target.value
+						}),
+						placeholder: "Title EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.title_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							title_es: e.target.value
+						}),
+						placeholder: "Title ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("textarea", {
+						value: data.body_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							body_en: e.target.value
+						}),
+						placeholder: "Body EN",
+						rows: 3,
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("textarea", {
+						value: data.body_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							body_es: e.target.value
+						}),
+						placeholder: "Body ES",
+						rows: 3,
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsxs("label", {
+						className: "flex items-center gap-2 text-sm",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: "checkbox",
+							checked: data.visible ?? true,
+							onChange: (e) => setEditData({
+								...data,
+								visible: e.target.checked
+							})
+						}), t("Visible", "Visible")]
+					})
+				]
+			});
+			case "dropoffs": return /* @__PURE__ */ jsxs("div", {
+				className: "grid gap-2",
+				children: [
+					/* @__PURE__ */ jsx("input", {
+						value: data.name || "",
+						onChange: (e) => setEditData({
+							...data,
+							name: e.target.value
+						}),
+						placeholder: "Name",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.address || "",
+						onChange: (e) => setEditData({
+							...data,
+							address: e.target.value
+						}),
+						placeholder: "Address",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.hours_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							hours_en: e.target.value
+						}),
+						placeholder: "Hours EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.hours_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							hours_es: e.target.value
+						}),
+						placeholder: "Hours ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.phone || "",
+						onChange: (e) => setEditData({
+							...data,
+							phone: e.target.value
+						}),
+						placeholder: "Phone",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.map_url || "",
+						onChange: (e) => setEditData({
+							...data,
+							map_url: e.target.value
+						}),
+						placeholder: "Map URL",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsxs("label", {
+						className: "flex items-center gap-2 text-sm",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: "checkbox",
+							checked: data.visible ?? true,
+							onChange: (e) => setEditData({
+								...data,
+								visible: e.target.checked
+							})
+						}), t("Visible", "Visible")]
+					})
+				]
+			});
+			case "volunteer": return /* @__PURE__ */ jsxs("div", {
+				className: "grid gap-2",
+				children: [
+					/* @__PURE__ */ jsx("input", {
+						value: data.title_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							title_en: e.target.value
+						}),
+						placeholder: "Title EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.title_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							title_es: e.target.value
+						}),
+						placeholder: "Title ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.desc_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							desc_en: e.target.value
+						}),
+						placeholder: "Description EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.desc_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							desc_es: e.target.value
+						}),
+						placeholder: "Description ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsxs("label", {
+						className: "flex items-center gap-2 text-sm",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: "checkbox",
+							checked: data.visible ?? true,
+							onChange: (e) => setEditData({
+								...data,
+								visible: e.target.checked
+							})
+						}), t("Visible", "Visible")]
+					})
+				]
+			});
+			case "donations": return /* @__PURE__ */ jsxs("div", {
+				className: "grid gap-2",
+				children: [
+					/* @__PURE__ */ jsx("input", {
+						value: data.name_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							name_en: e.target.value
+						}),
+						placeholder: "Name EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.name_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							name_es: e.target.value
+						}),
+						placeholder: "Name ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.details_en || "",
+						onChange: (e) => setEditData({
+							...data,
+							details_en: e.target.value
+						}),
+						placeholder: "Details EN",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.details_es || "",
+						onChange: (e) => setEditData({
+							...data,
+							details_es: e.target.value
+						}),
+						placeholder: "Details ES",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsx("input", {
+						value: data.link || "",
+						onChange: (e) => setEditData({
+							...data,
+							link: e.target.value
+						}),
+						placeholder: "Link",
+						className: "rounded-lg border bg-background px-3 py-2 text-sm"
+					}),
+					/* @__PURE__ */ jsxs("label", {
+						className: "flex items-center gap-2 text-sm",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: "checkbox",
+							checked: data.visible ?? true,
+							onChange: (e) => setEditData({
+								...data,
+								visible: e.target.checked
+							})
+						}), t("Visible", "Visible")]
+					})
+				]
+			});
+			default: return null;
+		}
+	};
+	if (isEditing) return /* @__PURE__ */ jsxs("div", {
+		className: "rounded-xl border bg-secondary p-4 space-y-3",
+		children: [renderFields(), /* @__PURE__ */ jsxs("div", {
+			className: "flex gap-2",
+			children: [/* @__PURE__ */ jsxs("button", {
+				onClick: () => onSave(data),
+				className: "flex-1 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground",
+				children: [
+					/* @__PURE__ */ jsx(Save, { className: "h-4 w-4 mr-1" }),
+					" ",
+					t("Save", "Guardar")
+				]
+			}), /* @__PURE__ */ jsxs("button", {
+				onClick: onCancel,
+				className: "flex-1 rounded-full border px-4 py-2 text-sm",
+				children: [
+					/* @__PURE__ */ jsx(X, { className: "h-4 w-4 mx-auto" }),
+					" ",
+					t("Cancel", "Cancelar")
+				]
+			})]
+		})]
+	});
+	const displayTitle = data.key || data.title_en || data.name || data.slug || data.label_en || item.id || "New";
+	return /* @__PURE__ */ jsxs("div", {
+		className: "flex items-start justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition",
+		children: [/* @__PURE__ */ jsxs("div", {
+			className: "flex-1 min-w-0",
+			children: [
+				/* @__PURE__ */ jsx("p", {
+					className: "font-medium text-primary truncate",
+					children: displayTitle
+				}),
+				data.en && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.en
+				}),
+				data.es && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.es
+				}),
+				data.title_en && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.title_en
+				}),
+				data.name && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.name
+				}),
+				data.address && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.address
+				}),
+				data.hours_en && /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-muted-foreground truncate",
+					children: data.hours_en
+				})
+			]
+		}), /* @__PURE__ */ jsxs("div", {
+			className: "flex items-center gap-1",
+			children: [/* @__PURE__ */ jsx("button", {
+				onClick: () => onEdit(item),
+				className: "p-1.5 hover:bg-accent rounded",
+				title: t("Edit", "Editar"),
+				children: /* @__PURE__ */ jsx(Pencil, { className: "h-4 w-4" })
+			}), /* @__PURE__ */ jsx("button", {
+				onClick: onDelete,
+				className: "p-1.5 hover:bg-red-100 rounded text-red-600",
+				title: t("Delete", "Eliminar"),
+				children: /* @__PURE__ */ jsx(Trash2, { className: "h-4 w-4" })
+			})]
+		})]
+	});
+}
+//#endregion
+export { AdminLayout as component };

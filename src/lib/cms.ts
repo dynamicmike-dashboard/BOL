@@ -12,6 +12,7 @@ import {
 } from "./content";
 
 export { type PageRow, SYSTEM_PATHS, pagePath };
+export { contentBlocks, pages, dropoffs, volunteerNeeds, donationMethods };
 
 // Static query helpers - no Supabase needed
 function createStaticQuery<T>(data: T[]) {

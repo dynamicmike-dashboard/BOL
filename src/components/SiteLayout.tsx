@@ -4,12 +4,11 @@ import { Menu, X, Facebook, Instagram, Youtube, MessageCircle, Globe } from "luc
 import { useLang } from "@/lib/i18n";
 import { pagePath, usePages, useBlocks } from "@/lib/cms";
 import { WhatsAppButton, LegalLinks } from "@/components/SiteExtras";
-import logoAsset from "@/assets/BOL_logo_upscayl_4x_ultrasharp.png.asset.json";
 
 export function LogoMark({ className = "h-10 w-10" }: { className?: string }) {
   return (
     <img
-      src={logoAsset.url}
+      src="/logo.png"
       alt="Breath of Life PDC"
       className={`shrink-0 object-contain ${className}`}
     />
