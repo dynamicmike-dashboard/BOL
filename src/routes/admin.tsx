@@ -6,7 +6,7 @@ import { contentBlocks, pages, dropoffs, volunteerNeeds, donationMethods, type P
 import { WhatsAppButton, LegalLinks } from "@/components/SiteExtras";
 import { SiteLayout } from "@/components/SiteLayout";
 
-const ADMIN_PASSWORD = "boladmin2024";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "boladmin2024";
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLang();
