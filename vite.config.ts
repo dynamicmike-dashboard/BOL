@@ -11,6 +11,7 @@ export default defineConfig({
       server: { entry: "server" },
       nitro: {
         preset: "vercel",
+        entry: "server",
       },
     }),
     react(),
