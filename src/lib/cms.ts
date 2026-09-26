@@ -1,59 +1,53 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useLang } from "./i18n";
+import {
+  contentBlocks,
+  pages,
+  dropoffs,
+  volunteerNeeds,
+  donationMethods,
+  type PageRow,
+  SYSTEM_PATHS,
+  pagePath,
+} from "./content";
 
-export type PageRow = {
-  id: string;
-  slug: string;
-  label_en: string;
-  label_es: string;
-  title_en: string;
-  title_es: string;
-  body_en: string;
-  body_es: string;
-  sort_order: number;
-  visible: boolean;
-  is_system: boolean;
-};
+export { type PageRow, SYSTEM_PATHS, pagePath };
 
-export const SYSTEM_PATHS: Record<string, string> = {
-  home: "/",
-  values: "/values",
-  help: "/help",
-  volunteer: "/volunteer",
-  "drop-off": "/drop-off",
-  donate: "/donate",
-  contact: "/contact",
-};
-export const pagePath = (p: { slug: string; is_system: boolean }) =>
-  p.is_system ? (SYSTEM_PATHS[p.slug] ?? "/") : `/p/${p.slug}`;
+// Static query helpers - no Supabase needed
+function createStaticQuery<T>(data: T[]) {
+  return {
+    data,
+    isLoading: false,
+    error: null,
+    isError: false,
+    isSuccess: true,
+  } as const;
+}
 
 export function useRows<T = any>(table: string) {
-  return useQuery({
-    queryKey: [table],
-    queryFn: async () => {
-      const { data, error } = await (supabase.from(table as any) as any)
-        .select("*")
-        .order(
-          table === "content_blocks" ? "key" : table === "messages" ? "created_at" : "sort_order",
-        );
-      if (error) throw error;
-      return (data ?? []) as T[];
-    },
-  });
+  const dataMap: Record<string, any[]> = {
+    content_blocks: Object.entries(contentBlocks).map(([key, val]) => ({ key, ...val })),
+    pages,
+    dropoffs,
+    volunteer_needs: volunteerNeeds,
+    donation_methods: donationMethods,
+    messages: [],
+  };
+
+  return createStaticQuery(dataMap[table] ?? []);
 }
 
 export function usePages() {
   return useRows<PageRow>("pages");
 }
 
-/** Returns a getter for translated content blocks. */
 export function useBlocks() {
   const { t } = useLang();
-  const q = useRows<{ key: string; value_en: string; value_es: string }>("content_blocks");
-  const map = new Map((q.data ?? []).map((r) => [r.key, r]));
+  const map = new Map(
+    Object.entries(contentBlocks).map(([key, val]) => [key, val])
+  );
   return (key: string, fallback = "") => {
     const r = map.get(key);
-    return r ? t(r.value_en, r.value_es) : fallback;
+    return r ? t(r.en, r.es) : fallback;
   };
 }

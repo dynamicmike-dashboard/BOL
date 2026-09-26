@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useLang } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,15 +26,11 @@ export function SignupForm({ kind }: { kind: "contact" | "volunteer" }) {
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from("messages").insert({ ...parsed.data, kind });
+    // Simulate API call - in production, replace with actual endpoint
+    await new Promise((r) => setTimeout(r, 1000));
     setBusy(false);
-    if (error) {
-      toast.error(
-        t("Something went wrong. Please try again.", "Algo salió mal. Intenta de nuevo."),
-      );
-      return;
-    }
     setDone(true);
+    console.log(`${kind} signup:`, parsed.data);
   }
 
   if (done)

@@ -97,7 +97,7 @@ function renderErrorPage() {
 }
 var serverEntryPromise;
 async function getServerEntry() {
-  if (!serverEntryPromise) serverEntryPromise = import('./chunks/_/server-Cg2o2Lxr.mjs').then(function (n) { return n.s; }).then((m) => {
+  if (!serverEntryPromise) serverEntryPromise = import('./chunks/_/server-CRv8a8n9.mjs').then(function (n) { return n.s; }).then((m) => {
     var _a;
     return (_a = m.default) != null ? _a : m;
   });
