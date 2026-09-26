@@ -189,6 +189,34 @@ function AdminItem({
   const data = isEditing ? editData : item;
 
   const renderFields = () => {
+    const TextArea = ({ value, onChange, placeholder, rows = 6, ...props }) => (
+      <div className="space-y-1">
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={rows}
+          className="w-full rounded-lg border bg-background px-3 py-2 text-sm font-mono text-xs"
+          {...props}
+        />
+        <p className="text-xs text-muted-foreground">HTML allowed (e.g., <code><strong>bold</strong></code>, <code><a href="...">link</a></code>)</p>
+      </div>
+    );
+
+    const ImageInput = ({ value, onChange, placeholder }) => (
+      <div className="space-y-1">
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+        />
+        {value && (
+          <img src={value} alt="Preview" className="max-w-xs h-auto rounded border" />
+        )}
+      </div>
+    );
+
     switch (type) {
       case "blocks":
         return (
@@ -196,20 +224,26 @@ function AdminItem({
             <input
               value={data.key || ""}
               onChange={(e) => setEditData({ ...data, key: e.target.value })}
-              placeholder="key"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              placeholder="key (e.g., hero_title)"
+              className="rounded-lg border bg-background px-3 py-2 text-sm font-mono"
             />
-            <input
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">EN</span>
+            </label>
+            <TextArea
               value={data.en || ""}
-              onChange={(e) => setEditData({ ...data, en: e.target.value })}
-              placeholder="English"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              onChange={(v) => setEditData({ ...data, en: v })}
+              placeholder="English content (HTML allowed)"
+              rows={4}
             />
-            <input
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">ES</span>
+            </label>
+            <TextArea
               value={data.es || ""}
-              onChange={(e) => setEditData({ ...data, es: e.target.value })}
-              placeholder="Español"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              onChange={(v) => setEditData({ ...data, es: v })}
+              placeholder="Spanish content (HTML allowed)"
+              rows={4}
             />
           </div>
         );
@@ -219,55 +253,81 @@ function AdminItem({
             <input
               value={data.slug || ""}
               onChange={(e) => setEditData({ ...data, slug: e.target.value })}
-              placeholder="slug"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              placeholder="slug (e.g., about, team)"
+              className="rounded-lg border bg-background px-3 py-2 text-sm font-mono"
             />
             <input
               value={data.label_en || ""}
               onChange={(e) => setEditData({ ...data, label_en: e.target.value })}
-              placeholder="Label EN"
+              placeholder="Menu Label EN (e.g., About Us)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.label_es || ""}
               onChange={(e) => setEditData({ ...data, label_es: e.target.value })}
-              placeholder="Label ES"
+              placeholder="Menu Label ES (e.g., Sobre Nosotros)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.title_en || ""}
               onChange={(e) => setEditData({ ...data, title_en: e.target.value })}
-              placeholder="Title EN"
+              placeholder="Page Title EN"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.title_es || ""}
               onChange={(e) => setEditData({ ...data, title_es: e.target.value })}
-              placeholder="Title ES"
+              placeholder="Page Title ES"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
-            <textarea
-              value={data.body_en || ""}
-              onChange={(e) => setEditData({ ...data, body_en: e.target.value })}
-              placeholder="Body EN"
-              rows={3}
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            <ImageInput
+              value={data.image || ""}
+              onChange={(v) => setEditData({ ...data, image: v })}
+              placeholder="Image URL (optional)"
             />
-            <textarea
-              value={data.body_es || ""}
-              onChange={(e) => setEditData({ ...data, body_es: e.target.value })}
-              placeholder="Body ES"
-              rows={3}
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            />
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={data.visible ?? true}
-                onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
-              />
-              {t("Visible", "Visible")}
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">Body EN</span>
             </label>
+            <TextArea
+              value={data.body_en || ""}
+              onChange={(v) => setEditData({ ...data, body_en: v })}
+              placeholder="Page content EN (HTML allowed)"
+              rows={8}
+            />
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono textxs">Body ES</span>
+            </label>
+            <TextArea
+              value={data.body_es || ""}
+              onChange={(v) => setEditData({ ...data, body_es: v })}
+              placeholder="Page content ES (HTML allowed)"
+              rows={8}
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                value={data.sort_order ?? 0}
+                onChange={(e) => setEditData({ ...data, sort_order: parseInt(e.target.value) || 0 })}
+                type="number"
+                placeholder="Sort order"
+                className="rounded-lg border bg-background px-3 py-2 text-sm"
+              />
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={data.visible ?? true}
+                  onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                />
+                {t("Visible in menu", "Visible en menú")}
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={data.is_system ?? false}
+                  onChange={(e) => setEditData({ ...data, is_system: e.target.checked })}
+                />
+                {t("System page (can't delete)", "Página del sistema (no eliminable)")}
+              </label>
+            </div>
           </div>
         );
       case "dropoffs":
@@ -276,25 +336,25 @@ function AdminItem({
             <input
               value={data.name || ""}
               onChange={(e) => setEditData({ ...data, name: e.target.value })}
-              placeholder="Name"
+              placeholder="Location name"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.address || ""}
               onChange={(e) => setEditData({ ...data, address: e.target.value })}
-              placeholder="Address"
+              placeholder="Full address"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.hours_en || ""}
               onChange={(e) => setEditData({ ...data, hours_en: e.target.value })}
-              placeholder="Hours EN"
+              placeholder="Hours EN (e.g., Mon-Fri 9am-5pm)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
               value={data.hours_es || ""}
               onChange={(e) => setEditData({ ...data, hours_es: e.target.value })}
-              placeholder="Hours ES"
+              placeholder="Hours ES (e.g., Lun-Vie 9am-5pm)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
             <input
@@ -306,17 +366,31 @@ function AdminItem({
             <input
               value={data.map_url || ""}
               onChange={(e) => setEditData({ ...data, map_url: e.target.value })}
-              placeholder="Map URL"
+              placeholder="Google Maps URL"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
-            <label className="flex items-center gap-2 text-sm">
+            <ImageInput
+              value={data.image || ""}
+              onChange={(v) => setEditData({ ...data, image: v })}
+              placeholder="Image URL (optional)"
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
               <input
-                type="checkbox"
-                checked={data.visible ?? true}
-                onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                value={data.sort_order ?? 0}
+                onChange={(e) => setEditData({ ...data, sort_order: parseInt(e.target.value) || 0 })}
+                type="number"
+                placeholder="Sort order"
+                className="rounded-lg border bg-background px-3 py-2 text-sm"
               />
-              {t("Visible", "Visible")}
-            </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={data.visible ?? true}
+                  onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                />
+                {t("Visible", "Visible")}
+              </label>
+            </div>
           </div>
         );
       case "volunteer":
@@ -334,26 +408,46 @@ function AdminItem({
               placeholder="Title ES"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
-            <input
-              value={data.desc_en || ""}
-              onChange={(e) => setEditData({ ...data, desc_en: e.target.value })}
-              placeholder="Description EN"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            <ImageInput
+              value={data.image || ""}
+              onChange={(v) => setEditData({ ...data, image: v })}
+              placeholder="Image URL (optional)"
             />
-            <input
-              value={data.desc_es || ""}
-              onChange={(e) => setEditData({ ...data, desc_es: e.target.value })}
-              placeholder="Description ES"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            />
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={data.visible ?? true}
-                onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
-              />
-              {t("Visible", "Visible")}
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">Desc EN</span>
             </label>
+            <TextArea
+              value={data.desc_en || ""}
+              onChange={(v) => setEditData({ ...data, desc_en: v })}
+              placeholder="Description EN (HTML allowed)"
+              rows={4}
+            />
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">Desc ES</span>
+            </label>
+            <TextArea
+              value={data.desc_es || ""}
+              onChange={(v) => setEditData({ ...data, desc_es: v })}
+              placeholder="Description ES (HTML allowed)"
+              rows={4}
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                value={data.sort_order ?? 0}
+                onChange={(e) => setEditData({ ...data, sort_order: parseInt(e.target.value) || 0 })}
+                type="number"
+                placeholder="Sort order"
+                className="rounded-lg border bg-background px-3 py-2 text-sm"
+              />
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={data.visible ?? true}
+                  onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                />
+                {t("Visible", "Visible")}
+              </label>
+            </div>
           </div>
         );
       case "donations":
@@ -371,32 +465,52 @@ function AdminItem({
               placeholder="Name ES"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
-            <input
-              value={data.details_en || ""}
-              onChange={(e) => setEditData({ ...data, details_en: e.target.value })}
-              placeholder="Details EN"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            <ImageInput
+              value={data.image || ""}
+              onChange={(v) => setEditData({ ...data, image: v })}
+              placeholder="Image/QR Code URL (optional)"
             />
-            <input
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">Details EN</span>
+            </label>
+            <TextArea
+              value={data.details_en || ""}
+              onChange={(v) => setEditData({ ...data, details_en: v })}
+              placeholder="Details EN (HTML allowed)"
+              rows={4}
+            />
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="w-20 font-mono text-xs">Details ES</span>
+            </label>
+            <TextArea
               value={data.details_es || ""}
-              onChange={(e) => setEditData({ ...data, details_es: e.target.value })}
-              placeholder="Details ES"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              onChange={(v) => setEditData({ ...data, details_es: v })}
+              placeholder="Details ES (HTML allowed)"
+              rows={4}
             />
             <input
               value={data.link || ""}
               onChange={(e) => setEditData({ ...data, link: e.target.value })}
-              placeholder="Link"
+              placeholder="Donation link (e.g., Stripe, PayPal)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             />
-            <label className="flex items-center gap-2 text-sm">
+            <div className="grid gap-2 sm:grid-cols-2">
               <input
-                type="checkbox"
-                checked={data.visible ?? true}
-                onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                value={data.sort_order ?? 0}
+                onChange={(e) => setEditData({ ...data, sort_order: parseInt(e.target.value) || 0 })}
+                type="number"
+                placeholder="Sort order"
+                className="rounded-lg border bg-background px-3 py-2 text-sm"
               />
-              {t("Visible", "Visible")}
-            </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={data.visible ?? true}
+                  onChange={(e) => setEditData({ ...data, visible: e.target.checked })}
+                />
+                {t("Visible", "Visible")}
+              </label>
+            </div>
           </div>
         );
       default:

@@ -8,6 +8,7 @@ export type PageRow = {
   title_es: string;
   body_en: string;
   body_es: string;
+  image?: string;
   sort_order: number;
   visible: boolean;
   is_system: boolean;
@@ -221,6 +222,7 @@ export const dropoffs = [
     hours_es: "Lun-Sáb 12pm-10pm",
     phone: "+52 984 111 2222",
     map_url: "https://maps.google.com/?q=Roma+Spaghetti+Playa+del+Carmen",
+    image: "",
     visible: true,
     sort_order: 1,
   },
@@ -232,6 +234,7 @@ export const dropoffs = [
     hours_es: "Diario 8am-10pm",
     phone: "+52 984 333 4444",
     map_url: "https://maps.google.com/?q=Pueblito+Escondido+Calle+38+Playa+del+Carmen",
+    image: "",
     visible: true,
     sort_order: 2,
   },
@@ -245,6 +248,7 @@ export const volunteerNeeds = [
     title_es: "Empaque de Alimentos",
     desc_en: "Help assemble weekly despensas every Tuesday morning.",
     desc_es: "Ayuda a armar despensas semanales cada martes por la mañana.",
+    image: "",
     visible: true,
     sort_order: 1,
   },
@@ -254,6 +258,7 @@ export const volunteerNeeds = [
     title_es: "Ventas de Huerto",
     desc_en: "Run the weekend plant/veggie sale to raise funds.",
     desc_es: "Organiza la venta de plantas/verduras del fin de semana para recaudar fondos.",
+    image: "",
     visible: true,
     sort_order: 2,
   },
@@ -263,6 +268,7 @@ export const volunteerNeeds = [
     title_es: "Apoyo en Eventos",
     desc_en: "Help with holiday celebrations, kids' activities, and community gatherings.",
     desc_es: "Ayuda en celebraciones navideñas, actividades para niños y reuniones comunitarias.",
+    image: "",
     visible: true,
     sort_order: 3,
   },
@@ -278,6 +284,7 @@ export const donationMethods = [
     details_es: "Seguro via Stripe. Único o mensual.",
     link: "https://donate.stripe.com/bol",
     qr: "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https://donate.stripe.com/bol",
+    image: "",
     visible: true,
     sort_order: 1,
   },
@@ -289,6 +296,7 @@ export const donationMethods = [
     details_es: "Recibos deducibles de impuestos en USA y Canadá disponibles.",
     link: "https://paypal.me/BreathOfLifePDC",
     qr: "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https://paypal.me/BreathOfLifePDC",
+    image: "",
     visible: true,
     sort_order: 2,
   },
@@ -300,6 +308,7 @@ export const donationMethods = [
     details_es: "Paga en efectivo en cualquier OXXO en México. Referencia: BOL",
     link: "",
     qr: "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=OXXO+payment+reference+BOL",
+    image: "",
     visible: true,
     sort_order: 3,
   },
@@ -311,6 +320,7 @@ export const donationMethods = [
     details_es: "BBVA | Cuenta: 0123456789 | CLABE: 012180001234567890 | Ref: BOL",
     link: "",
     qr: "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=BBVA+transfer+reference+BOL",
+    image: "",
     visible: true,
     sort_order: 4,
   },
