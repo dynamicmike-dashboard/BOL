@@ -9,10 +9,6 @@ export default defineConfig({
   plugins: [
     tanstackStart({
       server: { entry: "server" },
-      nitro: {
-        preset: "vercel",
-        entry: "server",
-      },
     }),
     react(),
     tailwindcss(),
