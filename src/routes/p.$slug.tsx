@@ -30,6 +30,15 @@ function CustomPage() {
       ) : page ? (
         <>
           <PageHero title={t(page.title_en || page.label_en, page.title_es || page.label_es)} />
+          {page.image && (
+            <Reveal>
+              <img
+                src={page.image}
+                alt={t(page.title_en || page.label_en, page.title_es || page.label_es)}
+                className="w-full rounded-[2rem] object-cover shadow-2xl mb-12"
+              />
+            </Reveal>
+          )}
           <article className="mx-auto max-w-3xl whitespace-pre-line px-4 py-16 text-lg leading-relaxed text-foreground/85">
             {t(page.body_en, page.body_es)}
           </article>
