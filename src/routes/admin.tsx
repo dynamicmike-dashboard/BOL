@@ -51,11 +51,11 @@ function AdminPanelLayout({ children }: { children: React.ReactNode }) {
         <button onClick={() => setAuthed(false)} className="flex items-center gap-2 rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent"><LogOut className="h-4 w-4" /> {t("Logout", "Salir")}</button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <AdminSection title={t("Content Blocks", "Bloques de Contenido")} icon={Image} items={Object.entries(contentBlocks).map(([key, val]) => ({ key, ...val }))} type="blocks" />
-        <AdminSection title={t("Pages", "Páginas")} icon={Pencil} items={pages} type="pages" />
-        <AdminSection title={t("Drop-off Points", "Puntos de Entrega")} icon={Image} items={dropoffs} type="dropoffs" />
-        <AdminSection title={t("Volunteer Needs", "Necesidades de Voluntariado")} icon={Pencil} items={volunteerNeeds} type="volunteer" />
-        <AdminSection title={t("Donation Methods", "Métodos de Donación")} icon={Image} items={donationMethods} type="donations" />
+        <AdminSection title={t("Content Blocks", "Bloques de Contenido")} icon={Image} items={Object.entries(contentBlocks || {}).map(([key, val]) => ({ key, ...val }))} type="blocks" />
+        <AdminSection title={t("Pages", "Páginas")} icon={Pencil} items={pages || []} type="pages" />
+        <AdminSection title={t("Drop-off Points", "Puntos de Entrega")} icon={Image} items={dropoffs || []} type="dropoffs" />
+        <AdminSection title={t("Volunteer Needs", "Necesidades de Voluntariado")} icon={Pencil} items={volunteerNeeds || []} type="volunteer" />
+        <AdminSection title={t("Donation Methods", "Métodos de Donación")} icon={Image} items={donationMethods || []} type="donations" />
       </div>
     </SiteLayout>
   );
