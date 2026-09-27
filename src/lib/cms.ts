@@ -45,7 +45,7 @@ export function usePages() {
 export function useBlocks() {
   const { t } = useLang();
   const map = new Map(
-    Object.entries(contentBlocks).map(([key, val]) => [key, val])
+    Object.entries(contentBlocks || {}).map(([key, val]) => [key, val])
   );
   return (key: string, fallback = "") => {
     const r = map.get(key);
