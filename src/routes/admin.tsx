@@ -7,7 +7,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "boladmin2024";
 
-const contentBlocksArray = Object.entries(contentBlocks).map(([key, val]) => ({ key, ...val }));
+const contentBlocksArray = Object.entries(contentBlocks || {}).map(([key, val]) => ({ key, ...val }));
 
 const getDefaultItem = (type: string) => {
   switch (type) {
