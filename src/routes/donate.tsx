@@ -12,13 +12,13 @@ export const Route = createFileRoute("/donate")({
       {
         name: "description",
         content:
-          "Donate by Stripe, PayPal (USA & Canada tax purposes), OXXO or Mexican bank transfer. Reference your donation as BOL.",
+          "Donate by Stripe, PayPal (USA & Canada tax-deductible), OXXO, Banco Azteca, Mercado Pago W. Reference your donation as BOL.",
       },
       { property: "og:title", content: "Donate — Breath of Life PDC" },
       {
         property: "og:description",
         content:
-          "Every peso helps families in Playa del Carmen. Stripe, PayPal, OXXO and bank transfer.",
+          "Donate via Stripe, PayPal (tax-deductible), OXXO, Banco Azteca, Mercado Pago W. Every peso helps families in Playa del Carmen.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://breathoflifepdc.org/donate" },
@@ -61,14 +61,14 @@ function Donate() {
                     </a>
                   )}
                 </div>
-                {d.link && (
+                {d.qr && (
                   <img
                     alt="QR"
                     loading="lazy"
                     width={140}
                     height={140}
                     className="h-36 w-36 self-center rounded-xl border bg-card p-2"
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(d.link)}`}
+                    src={d.qr.startsWith('/') ? d.qr : `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(d.link)}`}
                   />
                 )}
               </div>
