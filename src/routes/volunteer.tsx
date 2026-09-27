@@ -40,6 +40,13 @@ function Volunteer() {
         title={t("Come and make them smile", "Ven y hazlos sonreír")}
         sub={b("volunteer_intro")}
       />
+      <Reveal>
+        <img
+          src="/volunteers.jpg"
+          alt={t("Our volunteer team", "Nuestro equipo de voluntarios")}
+          className="w-full rounded-[2rem] object-cover shadow-2xl mb-12"
+        />
+      </Reveal>
       <section className="mx-auto grid max-w-6xl gap-12 px-4 py-20 lg:grid-cols-2">
         <div>
           <h2 className="text-3xl font-semibold text-primary">
