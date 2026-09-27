@@ -12,13 +12,13 @@ export const Route = createFileRoute("/donate")({
       {
         name: "description",
         content:
-          "Donate by Stripe, PayPal (USA & Canada tax-deductible), OXXO, Banco Azteca, Mercado Pago W. Reference your donation as BOL.",
+          "Donate via Stripe, PayPal (USA/Canada tax-deductible), OXXO, Banco Azteca, PayPal Mexico. Reference your donation as BOL.",
       },
       { property: "og:title", content: "Donate — Breath of Life PDC" },
       {
         property: "og:description",
         content:
-          "Donate via Stripe, PayPal (tax-deductible), OXXO, Banco Azteca, Mercado Pago W. Every peso helps families in Playa del Carmen.",
+          "Donate via Stripe, PayPal (tax-deductible USA/Canada), OXXO, Banco Azteca, PayPal Mexico. Every peso helps families in Playa del Carmen.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://breathoflifepdc.org/donate" },

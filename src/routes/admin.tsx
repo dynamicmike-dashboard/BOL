@@ -61,11 +61,12 @@ function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AdminSection({ title, icon: Icon, items, type }: { title: string; icon: React.ComponentType<{ className?: string }>; items: any[]; type: string }) {
+function AdminSection({ title, icon: Icon, initialItems, type }: { title: string; icon: React.ComponentType<{ className?: string }>; initialItems: any[]; type: string }) {
   const { t } = useLang();
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>(null);
   const [newItemDefaults, setNewItemDefaults] = useState<any>(null);
+  const [items, setItems] = useState<any[]>(initialItems);
 
   const getDefaultItem = (type: string) => {
     switch (type) {
@@ -99,6 +100,9 @@ function AdminSection({ title, icon: Icon, items, type }: { title: string; icon:
   const handleSave = (updated: any) => {
     console.log(`${type} save:`, updated);
     alert(`${title} saved: ${JSON.stringify(updated)}`);
+    if (editingKey === "new") {
+      setItems(prev => [...prev, updated]);
+    }
     setEditingKey(null);
     setEditData(null);
     setNewItemDefaults(null);
