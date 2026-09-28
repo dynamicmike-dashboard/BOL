@@ -27,11 +27,11 @@ function createStaticQuery<T>(data: T[]) {
 
 export function useRows<T = any>(table: string) {
   const dataMap: Record<string, any[]> = {
-    content_blocks: Object.entries(contentBlocks).map(([key, val]) => ({ key, ...val })),
-    pages,
-    dropoffs,
-    volunteer_needs: volunteerNeeds,
-    donation_methods: donationMethods,
+    content_blocks: Object.entries(contentBlocks || {}).map(([key, val]) => ({ key, ...val })),
+    pages: pages || [],
+    dropoffs: dropoffs || [],
+    volunteer_needs: volunteerNeeds || [],
+    donation_methods: donationMethods || [],
     messages: [],
   };
 

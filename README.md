@@ -39,7 +39,7 @@ Build a modern, animated bilingual (English & Spanish) website and admin CMS for
 1. **Admin page** - Fixed crash with `|| {}` fallbacks, but may still crash on Vercel if `contentBlocks` import fails. Fallback `|| {}` added.
 2. **Team page (/p/team)** - `team.jpg` added, displays on dynamic page template.
 3. **About page (/p/about)** - Added `image: "/about.jpg"` field but needs `about.jpg` in `/public`.
-5. **Admin password** - Use `boladmin2024` or set `VITE_ADMIN_PASSWORD` in Vercel env vars.
+4. **Admin password** - Use `boladmin2024` or set `VITE_ADMIN_PASSWORD` in Vercel env vars.
 6. **Vercel deployment** - Latest commit pushed. Need manual redeploy on Vercel Dashboard (Deployments → Redeploy) to pick up latest changes.
 
 ### Vercel Deployment Steps
@@ -57,6 +57,7 @@ npm run dev
 ```
 
 ### Recent Commits
+- `d32daef` - Fix: Add defensive fallbacks for all admin data imports and page image rendering
 - `d249580` - Add image field to about page for dynamic page images
 - `a2ac494` - Fix admin page crash: add contentBlocks || {} fallback in cms.ts
 - `8f8eca3` - Fix admin page crash: add contentBlocks || {} fallback
