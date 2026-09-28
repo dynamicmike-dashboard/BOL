@@ -10,18 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as DropOffRouteImport } from './routes/drop-off'
-import { Route as HelpRouteImport } from './routes/help'
+import { Route as TeamRouteImport } from './routes/team'
 import { Route as ValuesRouteImport } from './routes/values'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
-import { Route as PSlugRouteImport } from './routes/p.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -44,9 +49,9 @@ const DropOffRoute = DropOffRouteImport.update({
   path: '/drop-off',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ValuesRoute = ValuesRouteImport.update({
@@ -59,92 +64,87 @@ const VolunteerRoute = VolunteerRouteImport.update({
   path: '/volunteer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PSlugRoute = PSlugRouteImport.update({
-  id: '/p/$slug',
-  path: '/p/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
-  '/help': typeof HelpRoute
+  '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
-  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
-  '/help': typeof HelpRoute
+  '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
-  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
-  '/help': typeof HelpRoute
+  '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
-  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
     | '/contact'
     | '/donate'
     | '/drop-off'
-    | '/help'
+    | '/team'
     | '/values'
     | '/volunteer'
-    | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/admin'
     | '/contact'
     | '/donate'
     | '/drop-off'
-    | '/help'
+    | '/team'
     | '/values'
     | '/volunteer'
-    | '/p/$slug'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
     | '/contact'
     | '/donate'
     | '/drop-off'
-    | '/help'
+    | '/team'
     | '/values'
     | '/volunteer'
-    | '/p/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
   DropOffRoute: typeof DropOffRoute
-  HelpRoute: typeof HelpRoute
+  TeamRoute: typeof TeamRoute
   ValuesRoute: typeof ValuesRoute
   VolunteerRoute: typeof VolunteerRoute
-  PSlugRoute: typeof PSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -184,11 +191,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DropOffRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/values': {
@@ -205,26 +212,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VolunteerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/p/$slug': {
-      id: '/p/$slug'
-      path: '/p/$slug'
-      fullPath: '/p/$slug'
-      preLoaderRoute: typeof PSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
   DropOffRoute: DropOffRoute,
-  HelpRoute: HelpRoute,
+  TeamRoute: TeamRoute,
   ValuesRoute: ValuesRoute,
   VolunteerRoute: VolunteerRoute,
-  PSlugRoute: PSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
