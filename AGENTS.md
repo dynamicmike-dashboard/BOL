@@ -1,12 +1,12 @@
 - CMS content lives in Cloud tables (pages, content_blocks, dropoffs, volunteer_needs, donation_methods, messages) with `_en`/`_es` columns; read via `useRows`/`useBlocks` in src/lib/cms.ts — keeps EN/ES in one page, editable from /admin.
 - First user to sign up becomes admin (trigger on auth.users); writes gated by `has_role(auth.uid(),'admin')` RLS.
-- **CURRENT STATE (2026-09-27):**
+- **CURRENT STATE (2026-09-28):**
   - **Admin panel (/admin)**: Fixed crash by adding `contentBlocks || {}` fallback in cms.ts and `|| []` fallbacks in admin.tsx. Login works but page may still crash if data not loaded. Password: `boladmin2024` or `VITE_ADMIN_PASSWORD` env var.
   - **Donate page (/donate)**: Updated with 4 methods (Stripe, PayPal tax-deductible, OXXO/Banco Azteca/Mercado Pago, PayPal Mexico). QR images use local files. Removed BBVA placeholder. Footer note added.
   - **Volunteer page (/volunteer)**: Added `volunteers.jpg` image at top with Reveal animation.
   - **Team page (/p/team)**: Added `team.jpg` image, updated p.$slug.tsx to display page.image for all custom pages.
   - **About page (/p/about)**: Added `image: "/about.jpg"` field (needs about.jpg in /public).
   - **Admin panel**: Fixed crash by adding `|| {}` fallbacks in admin.tsx and `contentBlocks || {}` in cms.ts. Clone/save now works with local state persistence.
-  - **Vercel deployment**: Latest commit `d249580` pushed. Need to redeploy on Vercel Dashboard (Deployments → Redeploy) to pick up latest changes.
+  - **Vercel deployment**: Latest commit pushed. Need to redeploy on Vercel Dashboard (Deployments → Redeploy) to pick up latest changes.
 - **VERCEL ENV VARS NEEDED**: `VITE_ADMIN_PASSWORD` (for admin login)
-- **VERCEL DEPLOYMENT**: Need to trigger fresh deploy on Vercel Dashboard (Deployments → Redeploy latest commit `d249580`)
+- **VERCEL DEPLOYMENT**: Need to trigger fresh deploy on Vercel Dashboard (Deployments → Redeploy latest commit)
