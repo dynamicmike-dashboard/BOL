@@ -35,7 +35,7 @@ function Team() {
         />
       </Reveal>
       <article className="mx-auto max-w-3xl whitespace-pre-line px-4 py-16 text-lg leading-relaxed text-foreground/85">
-        <p>Our work is made possible by dedicated volunteers who pack despensas, run events, and build community every week.</p>
+        {t(page.body_en, page.body_es)}
       </article>
     </SiteLayout>
   );

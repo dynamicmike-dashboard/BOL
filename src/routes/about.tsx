@@ -35,7 +35,7 @@ function About() {
         />
       </Reveal>
       <article className="mx-auto max-w-3xl whitespace-pre-line px-4 py-16 text-lg leading-relaxed text-foreground/85">
-        <p>Breath of Life PDC is a community charity based in Playa del Carmen, Mexico. We provide weekly food packages (despensas) to families in need, run community programs, and create spaces of belonging.</p>
+        {t(page.body_en, page.body_es)}
       </article>
     </SiteLayout>
   );

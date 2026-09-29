@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as DropOffRouteImport } from './routes/drop-off'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as ValuesRouteImport } from './routes/values'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
@@ -49,6 +50,11 @@ const DropOffRoute = DropOffRouteImport.update({
   path: '/drop-off',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
+  '/help': typeof HelpRoute
   '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
+  '/help': typeof HelpRoute
   '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/drop-off': typeof DropOffRoute
+  '/help': typeof HelpRoute
   '/team': typeof TeamRoute
   '/values': typeof ValuesRoute
   '/volunteer': typeof VolunteerRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/drop-off'
+    | '/help'
     | '/team'
     | '/values'
     | '/volunteer'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/drop-off'
+    | '/help'
     | '/team'
     | '/values'
     | '/volunteer'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/drop-off'
+    | '/help'
     | '/team'
     | '/values'
     | '/volunteer'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
   DropOffRoute: typeof DropOffRoute
+  HelpRoute: typeof HelpRoute
   TeamRoute: typeof TeamRoute
   ValuesRoute: typeof ValuesRoute
   VolunteerRoute: typeof VolunteerRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DropOffRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/team': {
       id: '/team'
       path: '/team'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
   DropOffRoute: DropOffRoute,
+  HelpRoute: HelpRoute,
   TeamRoute: TeamRoute,
   ValuesRoute: ValuesRoute,
   VolunteerRoute: VolunteerRoute,
