@@ -241,7 +241,11 @@ export function AdminDashboard() {
     // Load data from localStorage or API
     const loadData = async () => {
       try {
-        const res = await fetch("/api/admin/data", { credentials: "include" });
+        const res = await fetch("/api/admin/api/data", { 
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
         const data = await res.json();
         if (data.pages) setPages(data.pages);
         if (data.dropoffs) setDropoffs(data.dropoffs);
