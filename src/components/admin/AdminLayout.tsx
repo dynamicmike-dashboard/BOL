@@ -13,16 +13,7 @@ import { useLang } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface AdminContextType {
@@ -32,12 +23,7 @@ interface AdminContextType {
   isLoading: boolean;
 }
 
-const AdminAuthContext = createContext<{ 
-  isAuthed: boolean; 
-  login: (password: string) => Promise<boolean>;
-  logout: () => Promise<void>;
-  isLoading: boolean;
-} | null>(null);
+const AdminAuthContext = createContext<AdminContextType | null>(null);
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthed, setAuthed] = useState(false);
@@ -74,6 +60,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (data.success) {
+        setAuthed(true);
         return true;
       }
       return false;
@@ -88,6 +75,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         method: "POST", 
         credentials: "include" 
       });
+      setAuthed(false);
       window.location.href = "/admin";
     } catch {
       // Ignore errors
@@ -96,25 +84,10 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AdminAuthContext.Provider value={{ 
-      isAuthed: true, // For now, we'll handle auth client-side
-      login: async (password: string) => {
-        const res = await fetch("/api/admin/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ password }),
-        });
-        const data = await res.json();
-        return data.success;
-      },
-      logout: async () => {
-        await fetch("/api/admin/logout", { 
-          method: "POST", 
-          credentials: "include" 
-        });
-        window.location.href = "/admin";
-      },
-      isLoading: false,
+      isAuthed,
+      login,
+      logout,
+      isLoading,
     }}>
       {children}
     </AdminAuthContext.Provider>
@@ -129,9 +102,87 @@ export function useAdminAuth() {
   return context;
 }
 
+function LoginForm() {
+  const { t } = useLang();
+  const { login, isLoading } = useAdminAuth();
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    const success = await login(password);
+    if (!success) {
+      setError(t("admin.invalidPassword") || "Invalid password");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-card border rounded-lg shadow-sm p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground">Admin Access</h1>
+            <p className="text-muted-foreground mt-2">Enter password to access admin panel</p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="relative">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <div className="relative mt-1">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                  placeholder="Enter admin password"
+                  disabled={isLoading}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-[38px] text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+            
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
+            
+            <Button type="submit" className="w-full" disabled={isLoading} size="lg">
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLang();
+  const { isAuthed, isLoading, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthed) {
+    return <LoginForm />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,10 +199,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               ← View Site
             </a>
             <button
-              onClick={() => {
-                document.cookie = "bol_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.href = "/admin";
-              }}
+              onClick={logout}
               className="rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent"
             >
               Logout
