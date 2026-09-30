@@ -25,14 +25,15 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { 
-  getAdminData,
-  savePage, deletePage, clonePage,
-  saveDropoff, deleteDropoff, cloneDropoff,
-  saveVolunteerNeed, deleteVolunteerNeed, cloneVolunteerNeed,
-  saveDonationMethod, deleteDonationMethod, cloneDonationMethod,
-  saveContentBlock, deleteContentBlock,
-} from "@/routes/admin/api/data";
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+  const res = await fetch(`/api/admin${path}`, {
+    ...options,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  return res.json();
+}
 
 interface PageData {
   id: string;
@@ -482,7 +483,7 @@ export function AdminDashboard() {
     // Load data from API
     const loadData = async () => {
       try {
-        const data = await getAdminData();
+        const data = await apiFetch("/data");
         if (data.pages) setPages(data.pages);
         if (data.dropoffs) setDropoffs(data.dropoffs);
         if (data.volunteerNeeds) setVolunteers(data.volunteerNeeds);
