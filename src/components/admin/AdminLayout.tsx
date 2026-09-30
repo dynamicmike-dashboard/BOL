@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { 
   Lock, LogOut, Eye, EyeOff, Pencil, Trash2, Plus, Save, X, 
   Image, Copy, ArrowUpDown, Menu, X as XIcon, ChevronDown, 

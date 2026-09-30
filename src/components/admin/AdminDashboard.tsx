@@ -3,28 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { 
   LayoutDashboard, FileText, MapPin, Users, Heart, 
-  Settings, Layers, FileText, Image as ImageIcon,
+  Settings, Layers, Image as ImageIcon,
   Trash2, Edit, Copy, Save, X, ChevronDown, Plus,
-  Eye, EyeOff, Lock, LogOut, Copy, Save, X, 
+  Eye, EyeOff, Lock, LogOut, 
   ArrowUpDown, Menu, X as XIcon, ChevronDown, 
-  Copy as CopyIcon, Trash2, Edit, Save, X, 
-  ArrowUpDown, Menu, X as XIcon2
+  Copy as CopyIcon, Trash2 as Trash2Icon, Edit as EditIcon, Save as SaveIcon, X as XIcon2,
+  ArrowUpDown as ArrowUpDown2, Menu as MenuIcon
 } from "lucide-react";
-import { useLang } from "@/lib/i18n";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useLang } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
