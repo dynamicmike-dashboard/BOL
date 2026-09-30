@@ -1,184 +1,228 @@
+"use server";
+
 import { createServerFn } from "@tanstack/react-start";
+import type { PageRow, DropoffRow, VolunteerNeedRow, DonationMethodRow, ContentBlock } from "./content";
+import { defaultAdminData } from "@/lib/admin/defaultData";
+
+// In-memory storage (resets on serverless cold starts, but works for demo)
+// For production, use Vercel KV, Upstash Redis, or a database
+const memoryStore = {
+  pages: [...defaultAdminData.pages] as any[],
+  contentBlocks: defaultAdminData.contentBlocks || {} as any,
+  dropoffs: [...defaultAdminData.dropoffs] as any[],
+  volunteerNeeds: [...defaultAdminData.volunteerNeeds] as any[],
+  donationMethods: [...defaultAdminData.donationMethods] as any[],
+};
+
+async function readAllData() {
+  return {
+    pages: memoryStore.pages,
+    contentBlocks: memoryStore.contentBlocks,
+    dropoffs: memoryStore.dropoffs,
+    volunteerNeeds: memoryStore.volunteerNeeds,
+    donationMethods: memoryStore.donationMethods,
+  };
+}
 
 export const getAdminData = createServerFn({ method: "POST" })
   .handler(async () => {
-    return {
-      pages: [
-        {
-          id: "page-1",
-          slug: "team",
-          label_en: "Our Team",
-          label_es: "Nuestro Equipo",
-          title_en: "Our Team",
-          title_es: "Nuestro Equipo",
-          body_en: "Our team content...",
-          body_es: "Contenido del equipo...",
-          image: "/team.jpg",
-          sort_order: 1,
-          visible: true,
-          is_system: true,
-        },
-        {
-          id: "page-2",
-          slug: "about",
-          label_en: "About Us",
-          label_es: "Sobre Nosotros",
-          title_en: "About Us",
-          title_es: "Sobre Nosotros",
-          body_en: "About us content...",
-          body_es: "Contenido sobre nosotros...",
-          image: "/about.jpg",
-          sort_order: 2,
-          visible: true,
-          is_system: false,
-        },
-      ],
-      dropoffs: [
-        {
-          id: "dropoff-1",
-          name: "Roma Spaghetti",
-          address: "Calle 34, entre 5ta y 10ma Av",
-          hours_en: "Mon-Sat 12pm-10pm",
-          hours_es: "Lun-Sáb 12pm-10pm",
-          phone: "+52 984 111 2222",
-          map_url: "https://maps.google.com/?q=Roma+Spaghetti+Playa+del+Carmen",
-          image: "",
-          sort_order: 1,
-          visible: true,
-        },
-        {
-          id: "dropoff-2",
-          name: "Pueblito Escondido Calle 38",
-          address: "Calle 38, entre 5ta y 10ma Av",
-          hours_en: "Daily 8am-10pm",
-          hours_es: "Diario 8am-10pm",
-          phone: "+52 984 333 4444",
-          map_url: "https://maps.google.com/?q=Pueblito+Escondido+Calle+38+Playa+del+Carmen",
-          image: "",
-          sort_order: 2,
-          visible: true,
-        },
-      ],
-      volunteerNeeds: [
-        {
-          id: "volunteer-1",
-          title_en: "Food Packing",
-          title_es: "Empaque de Alimentos",
-          desc_en: "Help assemble weekly despensas every Tuesday morning.",
-          desc_es: "Ayuda a armar despensas semanales cada martes por la mañana.",
-          image: "",
-          sort_order: 1,
-          visible: true,
-        },
-        {
-          id: "volunteer-2",
-          title_en: "Garden Sales",
-          title_es: "Ventas de Huerto",
-          desc_en: "Run the weekend plant/veggie sale to raise funds.",
-          desc_es: "Organiza la venta de plantas/verduras del fin de semana para recaudar fondos.",
-          image: "",
-          sort_order: 2,
-          visible: true,
-        },
-      ],
-      donationMethods: [
-        {
-          id: "1",
-          name_en: "Stripe",
-          name_es: "Stripe",
-          details_en: "Credit/Debit Card (Stripe). One-time or monthly.",
-          details_es: "Tarjeta de Crédito/Débito (Stripe). Único o mensual.",
-          link: "https://buy.stripe.com/00g7sy5O9aJRgdafYY",
-          qr: "/QR-stripe-donate.webp",
-          image: "",
-          visible: true,
-          sort_order: 1,
-        },
-        {
-          id: "2",
-          name_en: "PayPal (USA & Canada tax-deductible)",
-          name_es: "PayPal (deducible de impuestos en USA y Canadá)",
-          details_en: "USA & Canada tax-deductible receipts available.",
-          details_es: "Recibos deducibles de impuestos en USA y Canadá disponibles.",
-          link: "https://www.paypal.com/ncp/payment/5DS8TXGHLDVL2",
-          qr: "/QR-USA-and-Canada-Tax-Purposes.webp",
-          image: "",
-          visible: true,
-          sort_order: 2,
-        },
-        {
-          id: "3",
-          name_en: "OXXO (Mexico)",
-          name_es: "OXXO (México)",
-          details_en: "Pay cash at any OXXO in Mexico. Reference: BOL",
-          details_es: "Paga en efectivo en cualquier OXXO en México. Referencia: BOL",
-          link: "",
-          qr: "",
-          image: "",
-          visible: true,
-          sort_order: 3,
-        },
-        {
-          id: "4",
-          name_en: "Banco Azteca",
-          name_es: "Banco Azteca",
-          details_en: "Michele Avila Mendoza | Card: 4027 6661 1819 3043 | CLABE: 127694013013508192",
-          details_es: "Michele Avila Mendoza | Tarjeta: 4027 6661 1819 3043 | CLABE: 127694013013508192",
-          link: "",
-          qr: "",
-          image: "",
-          visible: true,
-          sort_order: 4,
-        },
-        {
-          id: "5",
-          name_en: "Mercado Pago W",
-          name_es: "Mercado Pago W",
-          details_en: "Michele Avila Mendoza | CLABE: 722969010176925651",
-          details_es: "Michele Avila Mendoza | CLABE: 722969010176925651",
-          link: "",
-          qr: "",
-          image: "",
-          visible: true,
-          sort_order: 5,
-        },
-      ],
-      pages: [
-        {
-          id: "page-1",
-          slug: "team",
-          label_en: "Our Team",
-          label_es: "Nuestro Equipo",
-          title_en: "Our Team",
-          title_es: "Nuestro Equipo",
-          body_en: "Our team content...",
-          body_es: "Contenido del equipo...",
-          image: "/team.jpg",
-          sort_order: 1,
-          visible: true,
-          is_system: true,
-        },
-        {
-          id: "page-2",
-          slug: "about",
-          label_en: "About Us",
-          label_es: "Sobre Nosotros",
-          title_en: "About Us",
-          title_es: "Sobre Nosotros",
-          body_en: "About us content...",
-          body_es: "Contenido sobre nosotros...",
-          image: "/about.jpg",
-          sort_order: 1,
-          visible: true,
-          is_system: false,
-        },
-      ],
-      contentBlocks: {
-        donate_intro: {
-          en: "Monetary Donations: STRIPE: https://buy.stripe.com/00g7sy5O9aJRgdafYY | PAYPAL: axansolustra@gmail.com | OXXO or Mexican Bank: Banco Azteca (Michele Avila Mendoza, Card: 4027 6661 1819 3043, CLABE: 127694013013508192) | Mercado Pago W (CLABE: 722969010176925651). Reference: BOL. Cash accepted at drop-off locations.",
-          es: "Donaciones Monetarias: STRIPE: https://buy.stripe.com/00g7sy5O9aJRgdafYY | PAYPAL: axansolustra@gmail.com | OXXO o Depósito Bancario Mexicano: Banco Azteca (Michele Avila Mendoza, Tarjeta: 4027 6661 1819 3043, CLABE: 127694013013508192) | Mercado Pago W (CLABE: 722969010176925651). Referencia: BOL. Aceptamos efectivo en puntos de entrega."
-        },
-      },
+    const data = await readAllData();
+    return data;
+  });
+
+export const savePage = createServerFn({ method: "POST" })
+  .validator((data: { page: any }) => data)
+  .handler(async ({ data }) => {
+    const pages = memoryStore.pages;
+    const existingIndex = pages.findIndex((p: any) => p.id === data.page.id);
+    
+    if (data.page.id && existingIndex >= 0) {
+      pages[existingIndex] = data.page;
+    } else {
+      data.page.id = `page-${Date.now()}`;
+      pages.push(data.page);
+    }
+    
+    return { success: true };
+  });
+
+export const deletePage = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.pages = memoryStore.pages.filter((p: any) => p.id !== data.id);
+    return { success: true };
+  });
+
+export const clonePage = createServerFn({ method: "POST" })
+  .validator((data: { id: string; slug: string; title_en: string; title_es: string }) => data)
+  .handler(async ({ data }) => {
+    const pages = memoryStore.pages;
+    const page = pages.find((p: any) => p.id === data.id);
+    
+    if (!page) throw new Error("Page not found");
+    
+    const cloned = {
+      ...page,
+      id: `page-${Date.now()}`,
+      slug: `${data.slug}-copy`,
+      title_en: `${data.title_en} (Copy)`,
+      title_es: `${data.title_es} (Copia)`,
     };
-  },
-};
+    
+    pages.push(cloned);
+    return { success: true, page: cloned };
+  });
+
+export const saveDropoff = createServerFn({ method: "POST" })
+  .validator((data: { dropoff: any }) => data)
+  .handler(async ({ data }) => {
+    const dropoffs = memoryStore.dropoffs;
+    const existingIndex = dropoffs.findIndex((d: any) => d.id === data.dropoff.id);
+    
+    if (data.dropoff.id && existingIndex >= 0) {
+      dropoffs[existingIndex] = data.dropoff;
+    } else {
+      data.dropoff.id = `dropoff-${Date.now()}`;
+      dropoffs.push(data.dropoff);
+    }
+    
+    return { success: true };
+  });
+
+export const cloneDropoff = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const dropoffs = memoryStore.dropoffs;
+    const dropoff = dropoffs.find((d: any) => d.id === data.id);
+    
+    if (!dropoff) throw new Error("Dropoff not found");
+    
+    const cloned = {
+      ...dropoff,
+      id: `dropoff-${Date.now()}`,
+      name: `${dropoff.name} (Copy)`,
+    };
+    
+    dropoffs.push(cloned);
+    return { success: true, dropoff: cloned };
+  });
+
+export const saveVolunteerNeed = createServerFn({ method: "POST" })
+  .validator((data: { need: any }) => data)
+  .handler(async ({ data }) => {
+    const needs = memoryStore.volunteerNeeds;
+    const existingIndex = needs.findIndex((n: any) => n.id === data.need.id);
+    
+    if (data.need.id && existingIndex >= 0) {
+      needs[existingIndex] = data.need;
+    } else {
+      data.need.id = `volunteer-${Date.now()}`;
+      needs.push(data.need);
+    }
+    
+    return { success: true };
+  });
+
+export const cloneVolunteerNeed = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const needs = memoryStore.volunteerNeeds;
+    const need = needs.find((n: any) => n.id === data.id);
+    
+    if (!need) throw new Error("Volunteer need not found");
+    
+    const cloned = {
+      ...need,
+      id: `volunteer-${Date.now()}`,
+      title_en: `${need.title_en} (Copy)`,
+      title_es: `${need.title_es} (Copia)`,
+    };
+    
+    needs.push(cloned);
+    return { success: true, need: cloned };
+  });
+
+export const saveDonationMethod = createServerFn({ method: "POST" })
+  .validator((data: { method: any }) => data)
+  .handler(async ({ data }) => {
+    const methods = memoryStore.donationMethods;
+    const existingIndex = methods.findIndex((m: any) => m.id === data.method.id);
+    
+    if (data.method.id && existingIndex >= 0) {
+      methods[existingIndex] = data.method;
+    } else {
+      data.method.id = `donation-${Date.now()}`;
+      methods.push(data.method);
+    }
+    
+    return { success: true };
+  });
+
+export const cloneDonationMethod = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const methods = memoryStore.donationMethods;
+    const method = methods.find((m: any) => m.id === data.id);
+    
+    if (!method) throw new Error("Donation method not found");
+    
+    const cloned = {
+      ...method,
+      id: `donation-${Date.now()}`,
+      name_en: `${method.name_en} (Copy)`,
+      name_es: `${method.name_es} (Copia)`,
+    };
+    
+    methods.push(cloned);
+    return { success: true, method: cloned };
+  });
+
+export const deleteDropoff = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.dropoffs = memoryStore.dropoffs.filter((d: any) => d.id !== data.id);
+    return { success: true };
+  });
+
+export const deleteVolunteerNeed = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.volunteerNeeds = memoryStore.volunteerNeeds.filter((n: any) => n.id !== data.id);
+    return { success: true };
+  });
+
+export const deleteDonationMethod = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.donationMethods = memoryStore.donationMethods.filter((m: any) => m.id !== data.id);
+    return { success: true };
+  });
+
+export const saveContentBlock = createServerFn({ method: "POST" })
+  .validator((data: { block: any }) => data)
+  .handler(async ({ data }) => {
+    const blocks = memoryStore.contentBlocks;
+    const key = data.block.key;
+    
+    if (blocks[key]) {
+      blocks[key] = { ...blocks[key], ...data.block };
+    } else {
+      blocks[key] = data.block;
+    }
+    
+    return { success: true };
+  });
+
+export const deleteContentBlock = createServerFn({ method: "POST" })
+  .validator((data: { key: string }) => data)
+  .handler(async ({ data }) => {
+    delete memoryStore.contentBlocks[data.key];
+    return { success: true };
+  });
+
+export const reorderItems = createServerFn({ method: "POST" })
+  .validator((data: { type: string; items: any[] }) => data)
+  .handler(async ({ data }) => {
+    (memoryStore as any)[data.type] = data.items;
+    return { success: true };
+  });

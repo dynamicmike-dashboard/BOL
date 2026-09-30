@@ -32,7 +32,7 @@ import {
   saveVolunteerNeed, deleteVolunteerNeed, cloneVolunteerNeed,
   saveDonationMethod, deleteDonationMethod, cloneDonationMethod,
   saveContentBlock, deleteContentBlock,
-} from "@/routes/admin/api/data";
+} from "@/routes/admin/api/-data";
 
 interface PageData {
   id: string;
