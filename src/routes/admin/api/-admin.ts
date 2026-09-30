@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 export const login = createServerFn({ method: "POST" })
   .validator((data: { password: string }) => data)
   .handler(async ({ data }) => {
-    const expectedPassword = process.env.VITE_ADMIN_PASSWORD || "boladmin2024";
+    const expectedPassword = process.env.ADMIN_PASSWORD || process.env.VITE_ADMIN_PASSWORD || "boladmin2024";
     if (data.password === expectedPassword) {
       return { success: true };
     }
