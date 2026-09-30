@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { login as loginFn, logout as logoutFn, verifySession } from "@/routes/admin/api/-admin";
+import { getAdminData } from "@/routes/admin/api/data";
 
 interface AdminContextType {
   isAuthed: boolean;
@@ -35,11 +37,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("/api/admin/verify", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json();
+      const data = await verifySession();
       if (data.valid) {
         setAuthed(true);
       }
@@ -52,13 +50,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (password: string): Promise<boolean> => {
     try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
+      const data = await loginFn({ password });
       if (data.success) {
         setAuthed(true);
         return true;
@@ -71,10 +63,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/admin/logout", { 
-        method: "POST", 
-        credentials: "include" 
-      });
+      await logoutFn();
       setAuthed(false);
       window.location.href = "/admin";
     } catch {

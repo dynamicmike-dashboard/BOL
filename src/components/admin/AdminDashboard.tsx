@@ -25,6 +25,14 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { 
+  getAdminData,
+  savePage, deletePage, clonePage,
+  saveDropoff, deleteDropoff, cloneDropoff,
+  saveVolunteerNeed, deleteVolunteerNeed, cloneVolunteerNeed,
+  saveDonationMethod, deleteDonationMethod, cloneDonationMethod,
+  saveContentBlock, deleteContentBlock,
+} from "@/routes/admin/api/data";
 
 interface PageData {
   id: string;
@@ -92,13 +100,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
 
   const handleSave = async (page: PageData) => {
     try {
-      const res = await fetch("/api/admin/api/savePage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ page }),
-      });
-      const data = await res.json();
+      const data = await savePage({ page });
       if (data.success) {
         toast.success("Page saved");
         setShowForm(false);
@@ -115,13 +117,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
   const handleDelete = async (page: PageData) => {
     if (confirm("Delete this page?")) {
       try {
-        const res = await fetch("/api/admin/api/deletePage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ id: page.id }),
-        });
-        const data = await res.json();
+        const data = await deletePage({ id: page.id });
         if (data.success) {
           toast.success("Page deleted");
           window.location.reload();
@@ -136,13 +132,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
 
   const handleClone = async (page: PageData) => {
     try {
-      const res = await fetch("/api/admin/api/clonePage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: page.id, slug: page.slug, title_en: page.title_en, title_es: page.title_es }),
-      });
-      const data = await res.json();
+      const data = await clonePage({ id: page.id, slug: page.slug, title_en: page.title_en, title_es: page.title_es });
       if (data.success) {
         toast.success("Page cloned");
         window.location.reload();
@@ -237,13 +227,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
 
   const handleSave = async (dropoff: DropoffData) => {
     try {
-      const res = await fetch("/api/admin/api/saveDropoff", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ dropoff }),
-      });
-      const data = await res.json();
+      const data = await saveDropoff({ dropoff });
       if (data.success) {
         toast.success("Drop-off saved");
         setShowForm(false);
@@ -259,13 +243,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
 
   const handleClone = async (dropoff: DropoffData) => {
     try {
-      const res = await fetch("/api/admin/api/cloneDropoff", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: dropoff.id }),
-      });
-      const data = await res.json();
+      const data = await cloneDropoff({ id: dropoff.id });
       if (data.success) {
         toast.success("Drop-off cloned");
         window.location.reload();
@@ -301,7 +279,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(dropoff); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(dropoff)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteDropoff", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: dropoff.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteDropoff({ id: dropoff.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -318,13 +296,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
 
   const handleSave = async (volunteer: VolunteerNeedData) => {
     try {
-      const res = await fetch("/api/admin/api/saveVolunteerNeed", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ need: volunteer }),
-      });
-      const data = await res.json();
+      const data = await saveVolunteerNeed({ need: volunteer });
       if (data.success) {
         toast.success("Volunteer need saved");
         setShowForm(false);
@@ -340,13 +312,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
 
   const handleClone = async (volunteer: VolunteerNeedData) => {
     try {
-      const res = await fetch("/api/admin/api/cloneVolunteerNeed", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: volunteer.id }),
-      });
-      const data = await res.json();
+      const data = await cloneVolunteerNeed({ id: volunteer.id });
       if (data.success) {
         toast.success("Volunteer need cloned");
         window.location.reload();
@@ -379,7 +345,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(volunteer); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(volunteer)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteVolunteerNeed", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: volunteer.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteVolunteerNeed({ id: volunteer.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -396,13 +362,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
 
   const handleSave = async (donation: DonationMethodData) => {
     try {
-      const res = await fetch("/api/admin/api/saveDonationMethod", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ method: donation }),
-      });
-      const data = await res.json();
+      const data = await saveDonationMethod({ method: donation });
       if (data.success) {
         toast.success("Donation method saved");
         setShowForm(false);
@@ -418,13 +378,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
 
   const handleClone = async (donation: DonationMethodData) => {
     try {
-      const res = await fetch("/api/admin/api/cloneDonationMethod", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: donation.id }),
-      });
-      const data = await res.json();
+      const data = await cloneDonationMethod({ id: donation.id });
       if (data.success) {
         toast.success("Donation method cloned");
         window.location.reload();
@@ -457,7 +411,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(donation); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(donation)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteDonationMethod", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: donation.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteDonationMethod({ id: donation.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -474,13 +428,7 @@ function AdminBlocks({ blocks, setBlocks }: { blocks: ContentBlockData[]; setBlo
 
   const handleSave = async (block: ContentBlockData) => {
     try {
-      const res = await fetch("/api/admin/api/saveContentBlock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ block }),
-      });
-      const data = await res.json();
+      const data = await saveContentBlock({ block });
       if (data.success) {
         toast.success("Content block saved");
         setShowForm(false);
@@ -534,12 +482,7 @@ export function AdminDashboard() {
     // Load data from API
     const loadData = async () => {
       try {
-        const res = await fetch("/api/admin/api/data", { 
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" }
-        });
-        const data = await res.json();
+        const data = await getAdminData();
         if (data.pages) setPages(data.pages);
         if (data.dropoffs) setDropoffs(data.dropoffs);
         if (data.volunteerNeeds) setVolunteers(data.volunteerNeeds);
