@@ -4,14 +4,24 @@
   "installCommand": "npm install",
   "regions": ["iad1"],
   "functions": {
-    "api/server.js": {
+    "api/_server/server.js": {
+      "maxDuration": 30
+    },
+    "api/admin/index.js": {
+      "maxDuration": 30
+    },
+    "api/admin/data.js": {
       "maxDuration": 30
     }
   },
   "rewrites": [
     {
+      "source": "/api/admin/(.*)",
+      "destination": "/api/admin/$1"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/api/server.js"
+      "destination": "/api/_server/server.js"
     }
   ],
   "outputDirectory": "dist/client"

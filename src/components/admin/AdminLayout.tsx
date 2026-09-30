@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { 
   Lock, LogOut, Eye, EyeOff, Pencil, Trash2, Plus, Save, X, 
@@ -15,8 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { login as loginFn, logout as logoutFn, verifySession } from "@/routes/admin/api/-admin";
-import { getAdminData } from "@/routes/admin/api/data";
 
 interface AdminContextType {
   isAuthed: boolean;
@@ -26,6 +24,18 @@ interface AdminContextType {
 }
 
 const AdminAuthContext = createContext<AdminContextType | null>(null);
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+  const res = await fetch(`/api/admin${path}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+  return res.json();
+}
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthed, setAuthed] = useState(false);
@@ -37,10 +47,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const data = await verifySession();
-      if (data.valid) {
-        setAuthed(true);
-      }
+      const data = await apiFetch("/verify");
+      if (data.valid) setAuthed(true);
     } catch {
       // Not authenticated
     } finally {
@@ -50,10 +58,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (password: string): Promise<boolean> => {
     try {
-      const data = await loginFn({ password });
+      const data = await apiFetch("/login", {
+        method: "POST",
+        body: JSON.stringify({ password }),
+      });
       if (data.success) {
-        // Set session cookie client-side
-        document.cookie = "bol_admin_session=authenticated; Path=/; Secure; SameSite=Lax; Max-Age=86400";
         setAuthed(true);
         return true;
       }
@@ -65,9 +74,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await logoutFn();
-      // Clear session cookie
-      document.cookie = "bol_admin_session=; Path=/; Secure; SameSite=Lax; Max-Age=0";
+      await apiFetch("/logout", { method: "POST" });
       setAuthed(false);
       window.location.href = "/admin";
     } catch {
@@ -76,12 +83,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ 
-      isAuthed,
-      login,
-      logout,
-      isLoading,
-    }}>
+    <AdminAuthContext.Provider value={{ isAuthed, login, logout, isLoading }}>
       {children}
     </AdminAuthContext.Provider>
   );
@@ -89,9 +91,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAdminAuth() {
   const context = useContext(AdminAuthContext);
-  if (!context) {
-    throw new Error("useAdminAuth must be used within AdminAuthProvider");
-  }
+  if (!context) throw new Error("useAdminAuth must be used within AdminAuthProvider");
   return context;
 }
 
@@ -106,9 +106,7 @@ function LoginForm() {
     e.preventDefault();
     setError("");
     const success = await login(password);
-    if (!success) {
-      setError(t("admin.invalidPassword") || "Invalid password");
-    }
+    if (!success) setError(t("admin.invalidPassword") || "Invalid password");
   };
 
   return (
@@ -119,12 +117,9 @@ function LoginForm() {
             <h1 className="text-2xl font-bold text-foreground">Admin Access</h1>
             <p className="text-muted-foreground mt-2">Enter password to access admin panel</p>
           </div>
-          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
-              <Label htmlFor="password" className="text-sm font-medium">
-                Password
-              </Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative mt-1">
                 <Input
                   id="password"
@@ -136,20 +131,12 @@ function LoginForm() {
                   disabled={isLoading}
                   autoComplete="current-password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-[38px] text-muted-foreground hover:text-foreground"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[38px] text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
-            
-            {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
-            )}
-            
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
             <Button type="submit" className="w-full" disabled={isLoading} size="lg">
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
@@ -173,9 +160,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthed) {
-    return <LoginForm />;
-  }
+  if (!isAuthed) return <LoginForm />;
 
   return (
     <div className="min-h-screen bg-background">
@@ -185,18 +170,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <h1 className="text-xl font-semibold text-primary">Admin Panel</h1>
           </div>
           <div className="flex items-center gap-2">
-            <a 
-              href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ← View Site
-            </a>
-            <button
-              onClick={logout}
-              className="rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent"
-            >
-              Logout
-            </button>
+            <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">← View Site</a>
+            <button onClick={logout} className="rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent">Logout</button>
           </div>
         </div>
       </header>

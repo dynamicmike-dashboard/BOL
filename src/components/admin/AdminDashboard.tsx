@@ -25,14 +25,15 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { 
-  getAdminData,
-  savePage, deletePage, clonePage,
-  saveDropoff, deleteDropoff, cloneDropoff,
-  saveVolunteerNeed, deleteVolunteerNeed, cloneVolunteerNeed,
-  saveDonationMethod, deleteDonationMethod, cloneDonationMethod,
-  saveContentBlock, deleteContentBlock,
-} from "@/routes/admin/api/-data";
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+  const res = await fetch(`/api/admin${path}`, {
+    ...options,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  return res.json();
+}
 
 interface PageData {
   id: string;
@@ -100,7 +101,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
 
   const handleSave = async (page: PageData) => {
     try {
-      const data = await savePage({ page });
+      const data = await apiFetch("/savePage", { method: "POST", body: JSON.stringify({ page }) });
       if (data.success) {
         toast.success("Page saved");
         setShowForm(false);
@@ -117,7 +118,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
   const handleDelete = async (page: PageData) => {
     if (confirm("Delete this page?")) {
       try {
-        const data = await deletePage({ id: page.id });
+        const data = await apiFetch("/deletePage", { method: "POST", body: JSON.stringify({ id: page.id }) });
         if (data.success) {
           toast.success("Page deleted");
           window.location.reload();
@@ -132,7 +133,7 @@ function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setP
 
   const handleClone = async (page: PageData) => {
     try {
-      const data = await clonePage({ id: page.id, slug: page.slug, title_en: page.title_en, title_es: page.title_es });
+      const data = await apiFetch("/clonePage", { method: "POST", body: JSON.stringify({ id: page.id, slug: page.slug, title_en: page.title_en, title_es: page.title_es }) });
       if (data.success) {
         toast.success("Page cloned");
         window.location.reload();
@@ -227,7 +228,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
 
   const handleSave = async (dropoff: DropoffData) => {
     try {
-      const data = await saveDropoff({ dropoff });
+      const data = await apiFetch("/saveDropoff", { method: "POST", body: JSON.stringify({ dropoff }) });
       if (data.success) {
         toast.success("Drop-off saved");
         setShowForm(false);
@@ -243,7 +244,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
 
   const handleClone = async (dropoff: DropoffData) => {
     try {
-      const data = await cloneDropoff({ id: dropoff.id });
+      const data = await apiFetch("/cloneDropoff", { method: "POST", body: JSON.stringify({ id: dropoff.id }) });
       if (data.success) {
         toast.success("Drop-off cloned");
         window.location.reload();
@@ -279,7 +280,7 @@ function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; set
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(dropoff); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(dropoff)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteDropoff({ id: dropoff.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await apiFetch("/deleteDropoff", { method: "POST", body: JSON.stringify({ id: dropoff.id }) }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -296,7 +297,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
 
   const handleSave = async (volunteer: VolunteerNeedData) => {
     try {
-      const data = await saveVolunteerNeed({ need: volunteer });
+      const data = await apiFetch("/saveVolunteerNeed", { method: "POST", body: JSON.stringify({ need: volunteer }) });
       if (data.success) {
         toast.success("Volunteer need saved");
         setShowForm(false);
@@ -312,7 +313,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
 
   const handleClone = async (volunteer: VolunteerNeedData) => {
     try {
-      const data = await cloneVolunteerNeed({ id: volunteer.id });
+      const data = await apiFetch("/cloneVolunteerNeed", { method: "POST", body: JSON.stringify({ id: volunteer.id }) });
       if (data.success) {
         toast.success("Volunteer need cloned");
         window.location.reload();
@@ -345,7 +346,7 @@ function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerN
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(volunteer); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(volunteer)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteVolunteerNeed({ id: volunteer.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await apiFetch("/deleteVolunteerNeed", { method: "POST", body: JSON.stringify({ id: volunteer.id }) }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -362,7 +363,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
 
   const handleSave = async (donation: DonationMethodData) => {
     try {
-      const data = await saveDonationMethod({ method: donation });
+      const data = await apiFetch("/saveDonationMethod", { method: "POST", body: JSON.stringify({ method: donation }) });
       if (data.success) {
         toast.success("Donation method saved");
         setShowForm(false);
@@ -378,7 +379,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
 
   const handleClone = async (donation: DonationMethodData) => {
     try {
-      const data = await cloneDonationMethod({ id: donation.id });
+      const data = await apiFetch("/cloneDonationMethod", { method: "POST", body: JSON.stringify({ id: donation.id }) });
       if (data.success) {
         toast.success("Donation method cloned");
         window.location.reload();
@@ -411,7 +412,7 @@ function AdminDonations({ donations, setDonations }: { donations: DonationMethod
             <div className="flex items-center gap-1">
               <button onClick={() => { setEditing(donation); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
               <button onClick={() => handleClone(donation)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
-              <button onClick={async () => { if (confirm("Delete?")) { const data = await deleteDonationMethod({ id: donation.id }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={async () => { if (confirm("Delete?")) { const data = await apiFetch("/deleteDonationMethod", { method: "POST", body: JSON.stringify({ id: donation.id }) }); if (data.success) window.location.reload(); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
             </div>
           </div>
         ))}
@@ -428,7 +429,7 @@ function AdminBlocks({ blocks, setBlocks }: { blocks: ContentBlockData[]; setBlo
 
   const handleSave = async (block: ContentBlockData) => {
     try {
-      const data = await saveContentBlock({ block });
+      const data = await apiFetch("/saveContentBlock", { method: "POST", body: JSON.stringify({ block }) });
       if (data.success) {
         toast.success("Content block saved");
         setShowForm(false);
@@ -482,7 +483,7 @@ export function AdminDashboard() {
     // Load data from API
     const loadData = async () => {
       try {
-        const data = await getAdminData();
+        const data = await apiFetch("/data");
         if (data.pages) setPages(data.pages);
         if (data.dropoffs) setDropoffs(data.dropoffs);
         if (data.volunteerNeeds) setVolunteers(data.volunteerNeeds);
