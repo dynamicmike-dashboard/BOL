@@ -1,8 +1,8 @@
 import "./lib/error-capture";
 
 // Import server function modules to register them
-import "@/routes/admin/api/-admin";
-import "@/routes/admin/api/-data";
+import "@/routes/admin/api/admin";
+import "@/routes/admin/api/data";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
