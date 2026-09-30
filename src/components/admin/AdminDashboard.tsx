@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { 
   LayoutDashboard, FileText, MapPin, Users, Heart, 
   Settings, Layers, FileText, Image as ImageIcon,
   Trash2, Edit, Copy, Save, X, ChevronDown, Plus,
   Eye, EyeOff, Lock, LogOut, Copy, Save, X, 
-  ArrowUpDown, Menu, X as XIcon, ChevronDown
+  ArrowUpDown, Menu, X as XIcon, ChevronDown, 
+  Copy as CopyIcon, Trash2, Edit, Save, X, 
+  ArrowUpDown, Menu, X as XIcon2
 } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { toast } from "sonner";
@@ -22,6 +24,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/i18n";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,12 +181,8 @@ export function AdminPages({ pages, setPages, onPageChange }: AdminPageProps) {
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-primary truncate">{page.label_en || page.title_en || page.slug || "Untitled"}</p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {t(page.label_en, page.label_es)}
-                </p>
-                {page.title_en && (
-                  <p className="text-xs text-muted-foreground truncate">{page.title_en}</p>
-                )}
+                <p className="text-xs text-muted-foreground truncate">{t(page.label_en, page.label_es)}</p>
+                {page.title_en && <p className="text-xs text-muted-foreground truncate">{page.title_en}</p>}
               </div>
             </div>
             <div className="flex items-center gap-1">

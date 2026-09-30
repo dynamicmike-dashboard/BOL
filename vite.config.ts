@@ -78,4 +78,6 @@ export default defineConfig({
       },
     }),
   ],
+  // Ignore API routes from being treated as routes
+  routeFileIgnorePattern: "src/routes/admin/api/.*",
 });

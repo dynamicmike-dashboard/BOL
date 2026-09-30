@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { 
   Lock, LogOut, Eye, EyeOff, Pencil, Trash2, Plus, Save, X, 
   Image, Copy, ArrowUpDown, Menu, X as XIcon, ChevronDown, 
@@ -73,7 +73,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (data.success) {
-        setAuthed(true);
         return true;
       }
       return false;
