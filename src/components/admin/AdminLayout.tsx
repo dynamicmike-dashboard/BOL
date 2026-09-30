@@ -52,6 +52,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await loginFn({ password });
       if (data.success) {
+        // Set session cookie client-side
+        document.cookie = "bol_admin_session=authenticated; Path=/; Secure; SameSite=Lax; Max-Age=86400";
         setAuthed(true);
         return true;
       }
@@ -64,6 +66,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await logoutFn();
+      // Clear session cookie
+      document.cookie = "bol_admin_session=; Path=/; Secure; SameSite=Lax; Max-Age=0";
       setAuthed(false);
       window.location.href = "/admin";
     } catch {
