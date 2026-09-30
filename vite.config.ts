@@ -78,6 +78,6 @@ export default defineConfig({
       },
     }),
   ],
-  // Ignore admin API files from being treated as routes
-  routeFileIgnorePattern: "src/routes/admin/api/.*",
+  // Ignore old admin server function files from being treated as routes
+  routeFileIgnorePattern: "src/routes/admin/api/(admin|data)\.ts",
 });
