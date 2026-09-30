@@ -9,8 +9,9 @@
     "api/admin/logout.js": { "maxDuration": 30 },
     "api/admin/data.js": { "maxDuration": 30 },
     "api/_server/server.js": { "maxDuration": 30 }
-  },
+  ],
   "rewrites": [
+    { "source": "/api/admin/(.*)", "destination": "/api/admin/$1" },
     { "source": "/(.*)", "destination": "/api/_server/server.js" }
   ],
   "outputDirectory": "dist/client"
