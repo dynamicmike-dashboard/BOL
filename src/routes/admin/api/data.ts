@@ -177,6 +177,49 @@ export const cloneDonationMethod = createServerFn({ method: "POST" })
     return { success: true, method: cloned };
   });
 
+export const deleteDropoff = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.dropoffs = memoryStore.dropoffs.filter((d: any) => d.id !== data.id);
+    return { success: true };
+  });
+
+export const deleteVolunteerNeed = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.volunteerNeeds = memoryStore.volunteerNeeds.filter((n: any) => n.id !== data.id);
+    return { success: true };
+  });
+
+export const deleteDonationMethod = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    memoryStore.donationMethods = memoryStore.donationMethods.filter((m: any) => m.id !== data.id);
+    return { success: true };
+  });
+
+export const saveContentBlock = createServerFn({ method: "POST" })
+  .validator((data: { block: any }) => data)
+  .handler(async ({ data }) => {
+    const blocks = memoryStore.contentBlocks;
+    const key = data.block.key;
+    
+    if (blocks[key]) {
+      blocks[key] = { ...blocks[key], ...data.block };
+    } else {
+      blocks[key] = data.block;
+    }
+    
+    return { success: true };
+  });
+
+export const deleteContentBlock = createServerFn({ method: "POST" })
+  .validator((data: { key: string }) => data)
+  .handler(async ({ data }) => {
+    delete memoryStore.contentBlocks[data.key];
+    return { success: true };
+  });
+
 export const reorderItems = createServerFn({ method: "POST" })
   .validator((data: { type: string; items: any[] }) => data)
   .handler(async ({ data }) => {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, FileText, MapPin, Users, Heart, 
   Settings, Layers, Image as ImageIcon,
   Trash2, Edit, Copy, Save, X, ChevronDown, Plus,
   Eye, EyeOff, Lock, LogOut, 
-  ArrowUpDown, Menu, X as XIcon, ChevronDown, 
+  ArrowUpDown, Menu, X as XIcon, ChevronDown as ChevronDown2, 
   Copy as CopyIcon, Trash2 as Trash2Icon, Edit as EditIcon, Save as SaveIcon, X as XIcon2,
   ArrowUpDown as ArrowUpDown2, Menu as MenuIcon
 } from "lucide-react";
@@ -35,13 +35,13 @@ interface PageData {
   title_es: string;
   body_en: string;
   body_es: string;
-  image?: string;
+  image: string;
   sort_order: number;
   visible: boolean;
   is_system: boolean;
 }
 
-interface DropoffItem {
+interface DropoffData {
   id: string;
   name: string;
   address: string;
@@ -49,75 +49,98 @@ interface DropoffItem {
   hours_es: string;
   phone: string;
   map_url: string;
-  image?: string;
+  image: string;
   sort_order: number;
   visible: boolean;
 }
 
-interface VolunteerNeed {
+interface VolunteerNeedData {
   id: string;
   title_en: string;
   title_es: string;
   desc_en: string;
   desc_es: string;
-  image?: string;
+  image: string;
   sort_order: number;
   visible: boolean;
 }
 
-interface DonationMethod {
+interface DonationMethodData {
   id: string;
   name_en: string;
   name_es: string;
   details_en: string;
   details_es: string;
   link: string;
-  image?: string;
-  sort_order: number;
+  qr: string;
+  image: string;
   visible: boolean;
+  sort_order: number;
 }
 
-interface ContentBlock {
+interface ContentBlockData {
+  id: string;
   key: string;
-  en: string;
-  es: string;
+  content_en: string;
+  content_es: string;
 }
 
-interface AdminPageProps {
-  pages: any[];
-  setPages: React.Dispatch<React.SetStateAction<any[]>>;
-  onPageChange: (pages: any[]) => void;
-}
-
-export function AdminPages({ pages, setPages, onPageChange }: AdminPageProps) {
+function AdminPages({ pages, setPages, onPageChange }: { pages: PageData[]; setPages: (pages: PageData[]) => void; onPageChange: (pages: PageData[]) => void }) {
   const { t } = useLang();
-  const [editingPage, setEditingPage] = useState<any>(null);
-  const [newPageDefaults, setNewPageDefaults] = useState<any>(null);
-  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingPage, setEditingPage] = useState<PageData | null>(null);
 
-  const startEdit = (page: any) => {
-    window.location.href = `/admin/pages/${page.id}`;
+  const handleSave = async (page: PageData) => {
+    try {
+      const res = await fetch("/api/admin/api/savePage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ page }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Page saved");
+        setShowForm(false);
+        setEditingPage(null);
+        window.location.reload();
+      } else {
+        toast.error("Failed to save page");
+      }
+    } catch {
+      toast.error("Failed to save page");
+    }
   };
 
-  const handleDelete = async (page: any) => {
+  const handleDelete = async (page: PageData) => {
     if (confirm("Delete this page?")) {
       try {
-        await fetch(`/api/admin/pages/${page.id}`, {
-          method: "DELETE",
+        const res = await fetch("/api/admin/api/deletePage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
+          body: JSON.stringify({ id: page.id }),
         });
-        toast.success("Page deleted");
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Page deleted");
+          window.location.reload();
+        } else {
+          toast.error("Failed to delete page");
+        }
       } catch {
         toast.error("Failed to delete page");
       }
     }
   };
 
-  const handleClone = async (page: any) => {
+  const handleClone = async (page: PageData) => {
     try {
-      const res = await fetch(`/api/admin/pages/${page.id}/clone`, {
+      const res = await fetch("/api/admin/api/clonePage", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify({ id: page.id, slug: page.slug, title_en: page.title_en, title_es: page.title_es }),
       });
       const data = await res.json();
       if (data.success) {
@@ -131,19 +154,18 @@ export function AdminPages({ pages, setPages, onPageChange }: AdminPageProps) {
     }
   };
 
-  const handleNewPage = () => {
-    window.location.href = "/admin/pages/new";
-  };
-
   return (
     <div className="rounded-2xl border bg-card p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-primary">
-          <Users className="h-5 w-5" />
+          <FileText className="h-5 w-5" />
           Pages
         </h2>
         <button
-          onClick={() => window.location.href = "/admin/pages/new"}
+          onClick={() => {
+            setEditingPage(null);
+            setShowForm(true);
+          }}
           className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent"
         >
           <Plus className="h-4 w-4" />
@@ -172,29 +194,24 @@ export function AdminPages({ pages, setPages, onPageChange }: AdminPageProps) {
             </div>
             <div className="flex items-center gap-1">
               <button
-                onClick={() => window.location.href = `/admin/pages/${page.id}`}
+                onClick={() => {
+                  setEditingPage(page);
+                  setShowForm(true);
+                }}
                 className="p-1.5 hover:bg-accent rounded"
                 title="Edit"
               >
                 <Edit className="h-4 w-4" />
               </button>
               <button
-                onClick={() => {
-                  if (confirm("Clone this page?")) {
-                    // TODO: Implement clone
-                  }
-                }
+                onClick={() => handleClone(page)}
                 className="p-1.5 hover:bg-blue-100 rounded text-blue-600"
                 title="Clone"
               >
                 <Copy className="h-4 w-4" />
               </button>
               <button
-                onClick={() => {
-                  if (confirm("Delete this page?")) {
-                    // TODO: Implement delete
-                  }
-                }
+                onClick={() => handleDelete(page)}
                 className="p-1.5 hover:bg-red-100 rounded text-red-600"
                 title="Delete"
               >
@@ -213,17 +230,308 @@ export function AdminPages({ pages, setPages, onPageChange }: AdminPageProps) {
   );
 }
 
+function AdminDropoffs({ dropoffs, setDropoffs }: { dropoffs: DropoffData[]; setDropoffs: (dropoffs: DropoffData[]) => void }) {
+  const { t } = useLang();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<DropoffData | null>(null);
+
+  const handleSave = async (dropoff: DropoffData) => {
+    try {
+      const res = await fetch("/api/admin/api/saveDropoff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ dropoff }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Drop-off saved");
+        setShowForm(false);
+        setEditing(null);
+        window.location.reload();
+      } else {
+        toast.error("Failed to save");
+      }
+    } catch {
+      toast.error("Failed to save");
+    }
+  };
+
+  const handleClone = async (dropoff: DropoffData) => {
+    try {
+      const res = await fetch("/api/admin/api/cloneDropoff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: dropoff.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Drop-off cloned");
+        window.location.reload();
+      } else {
+        toast.error("Failed to clone");
+      }
+    } catch {
+      toast.error("Failed to clone");
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border bg-card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-primary">
+          <MapPin className="h-5 w-5" />
+          Drop-off Points
+        </h2>
+        <button
+          onClick={() => { setEditing(null); setShowForm(true); }}
+          className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent"
+        >
+          <Plus className="h-4 w-4" /> Add Drop-off
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {dropoffs.map((dropoff) => (
+          <div key={dropoff.id} className="flex items-center justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-primary truncate">{dropoff.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{dropoff.address}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button onClick={() => { setEditing(dropoff); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
+              <button onClick={() => handleClone(dropoff)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
+              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteDropoff", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: dropoff.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ))}
+        {dropoffs.length === 0 && <div className="text-center py-8 text-muted-foreground">No drop-off points yet.</div>}
+      </div>
+    </div>
+  );
+}
+
+function AdminVolunteers({ volunteers, setVolunteers }: { volunteers: VolunteerNeedData[]; setVolunteers: (volunteers: VolunteerNeedData[]) => void }) {
+  const { t } = useLang();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<VolunteerNeedData | null>(null);
+
+  const handleSave = async (volunteer: VolunteerNeedData) => {
+    try {
+      const res = await fetch("/api/admin/api/saveVolunteerNeed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ need: volunteer }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Volunteer need saved");
+        setShowForm(false);
+        setEditing(null);
+        window.location.reload();
+      } else {
+        toast.error("Failed to save");
+      }
+    } catch {
+      toast.error("Failed to save");
+    }
+  };
+
+  const handleClone = async (volunteer: VolunteerNeedData) => {
+    try {
+      const res = await fetch("/api/admin/api/cloneVolunteerNeed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: volunteer.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Volunteer need cloned");
+        window.location.reload();
+      } else {
+        toast.error("Failed to clone");
+      }
+    } catch {
+      toast.error("Failed to clone");
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border bg-card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-primary">
+          <Users className="h-5 w-5" />
+          Volunteer Needs
+        </h2>
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent">
+          <Plus className="h-4 w-4" /> Add Volunteer Need
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {volunteers.map((volunteer) => (
+          <div key={volunteer.id} className="flex items-center justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-primary truncate">{t(volunteer.title_en, volunteer.title_es)}</p>
+              <p className="text-xs text-muted-foreground truncate">{t(volunteer.desc_en, volunteer.desc_es)}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button onClick={() => { setEditing(volunteer); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
+              <button onClick={() => handleClone(volunteer)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
+              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteVolunteerNeed", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: volunteer.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ))}
+        {volunteers.length === 0 && <div className="text-center py-8 text-muted-foreground">No volunteer needs yet.</div>}
+      </div>
+    </div>
+  );
+}
+
+function AdminDonations({ donations, setDonations }: { donations: DonationMethodData[]; setDonations: (donations: DonationMethodData[]) => void }) {
+  const { t } = useLang();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<DonationMethodData | null>(null);
+
+  const handleSave = async (donation: DonationMethodData) => {
+    try {
+      const res = await fetch("/api/admin/api/saveDonationMethod", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ method: donation }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Donation method saved");
+        setShowForm(false);
+        setEditing(null);
+        window.location.reload();
+      } else {
+        toast.error("Failed to save");
+      }
+    } catch {
+      toast.error("Failed to save");
+    }
+  };
+
+  const handleClone = async (donation: DonationMethodData) => {
+    try {
+      const res = await fetch("/api/admin/api/cloneDonationMethod", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: donation.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Donation method cloned");
+        window.location.reload();
+      } else {
+        toast.error("Failed to clone");
+      }
+    } catch {
+      toast.error("Failed to clone");
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border bg-card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-primary">
+          <Heart className="h-5 w-5" />
+          Donation Methods
+        </h2>
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent">
+          <Plus className="h-4 w-4" /> Add Method
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {donations.map((donation) => (
+          <div key={donation.id} className="flex items-center justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-primary truncate">{t(donation.name_en, donation.name_es)}</p>
+              <p className="text-xs text-muted-foreground truncate">{t(donation.details_en, donation.details_es)}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button onClick={() => { setEditing(donation); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
+              <button onClick={() => handleClone(donation)} className="p-1.5 hover:bg-blue-100 rounded text-blue-600" title="Clone"><Copy className="h-4 w-4" /></button>
+              <button onClick={() => { if (confirm("Delete?")) { fetch("/api/admin/api/deleteDonationMethod", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id: donation.id }) }).then(() => window.location.reload()); } }} className="p-1.5 hover:bg-red-100 rounded text-red-600" title="Delete"><Trash2 className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ))}
+        {donations.length === 0 && <div className="text-center py-8 text-muted-foreground">No donation methods yet.</div>}
+      </div>
+    </div>
+  );
+}
+
+function AdminBlocks({ blocks, setBlocks }: { blocks: ContentBlockData[]; setBlocks: (blocks: ContentBlockData[]) => void }) {
+  const { t } = useLang();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<ContentBlockData | null>(null);
+
+  const handleSave = async (block: ContentBlockData) => {
+    try {
+      const res = await fetch("/api/admin/api/saveContentBlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ block }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Content block saved");
+        setShowForm(false);
+        setEditing(null);
+        window.location.reload();
+      } else {
+        toast.error("Failed to save");
+      }
+    } catch {
+      toast.error("Failed to save");
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border bg-card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-primary">
+          <Layers className="h-5 w-5" />
+          Content Blocks
+        </h2>
+        <button onClick={() => { setEditing(null); setShowForm(true); }} className="rounded-full border bg-background px-3 py-1.5 text-sm hover:bg-accent">
+          <Plus className="h-4 w-4" /> Add Block
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {blocks.map((block) => (
+          <div key={block.id} className="flex items-center justify-between gap-2 rounded-xl border bg-secondary p-3 hover:border-accent transition">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-primary truncate">{block.key}</p>
+              <p className="text-xs text-muted-foreground truncate">{block.content_en?.substring(0, 60)}...</p>
+            </div>
+            <button onClick={() => { setEditing(block); setShowForm(true); }} className="p-1.5 hover:bg-accent rounded" title="Edit"><Edit className="h-4 w-4" /></button>
+          </div>
+        ))}
+        {blocks.length === 0 && <div className="text-center py-8 text-muted-foreground">No content blocks yet.</div>}
+      </div>
+    </div>
+  );
+}
+
 export function AdminDashboard() {
   const { t } = useLang();
   const [activeTab, setActiveTab] = useState<"pages" | "dropoffs" | "volunteer" | "donations" | "blocks">("pages");
-  const [pages, setPages] = useState<any[]>([]);
-  const [dropoffs, setDropoffs] = useState<any[]>([]);
-  const [volunteers, setVolunteers] = useState<any[]>([]);
-  const [donations, setDonations] = useState<any[]>([]);
-  const [blocks, setBlocks] = useState<any[]>([]);
+  const [pages, setPages] = useState<PageData[]>([]);
+  const [dropoffs, setDropoffs] = useState<DropoffData[]>([]);
+  const [volunteers, setVolunteers] = useState<VolunteerNeedData[]>([]);
+  const [donations, setDonations] = useState<DonationMethodData[]>([]);
+  const [blocks, setBlocks] = useState<ContentBlockData[]>([]);
 
   useEffect(() => {
-    // Load data from localStorage or API
+    // Load data from API
     const loadData = async () => {
       try {
         const res = await fetch("/api/admin/api/data", { 
@@ -236,8 +544,18 @@ export function AdminDashboard() {
         if (data.dropoffs) setDropoffs(data.dropoffs);
         if (data.volunteerNeeds) setVolunteers(data.volunteerNeeds);
         if (data.donationMethods) setDonations(data.donationMethods);
+        if (data.contentBlocks) {
+          // Convert contentBlocks object to array
+          const blocksArray = Object.entries(data.contentBlocks).map(([key, value]: [string, any]) => ({
+            id: key,
+            key,
+            content_en: value.en || value.content_en || "",
+            content_es: value.es || value.content_es || "",
+          }));
+          setBlocks(blocksArray);
+        }
       } catch {
-        // Fallback to localStorage
+        // Fallback - will use empty arrays
       }
     };
     loadData();
