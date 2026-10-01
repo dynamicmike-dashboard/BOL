@@ -78,6 +78,9 @@ export default defineConfig({
       },
     }),
   ],
-  // Ignore old admin server function files from being treated as routes
-  routeFileIgnorePattern: "src/routes/admin/api/(admin|data)\.ts",
+  build: {
+    rollupOptions: {
+      external: ["vinxi/http"],
+    },
+  },
 });

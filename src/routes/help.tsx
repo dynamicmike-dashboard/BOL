@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Package, ShoppingBasket, Gift, Home as HomeIcon, TreePine } from "lucide-react";
 import { SiteLayout, PageHero } from "@/components/SiteLayout";
 import { Reveal } from "@/components/Reveal";

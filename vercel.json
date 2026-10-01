@@ -3,16 +3,9 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "regions": ["iad1"],
-  "functions": {
-    "api/admin/verify.js": { "maxDuration": 30 },
-    "api/admin/login.js": { "maxDuration": 30 },
-    "api/admin/logout.js": { "maxDuration": 30 },
-    "api/admin/data.js": { "maxDuration": 30 },
-    "api/_server/server.js": { "maxDuration": 30 }
-  ],
   "rewrites": [
     { "source": "/api/admin/(.*)", "destination": "/api/admin/$1" },
-    { "source": "/(.*)", "destination": "/api/_server/server.js" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "outputDirectory": "dist/client"
 }

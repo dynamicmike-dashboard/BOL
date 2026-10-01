@@ -1,8 +1,15 @@
 "use server";
 
 import { createServerFn } from "@tanstack/react-start";
+import { checkAuthServer } from "@/lib/admin/cookies";
 import type { PageRow, DropoffRow, VolunteerNeedRow, DonationMethodRow, ContentBlock } from "./content";
 import { defaultAdminData } from "@/lib/admin/defaultData";
+
+function requireAuth() {
+  if (!checkAuthServer()) {
+    throw new Error("Unauthorized");
+  }
+}
 
 // In-memory storage (resets on serverless cold starts, but works for demo)
 // For production, use Vercel KV, Upstash Redis, or a database
@@ -15,6 +22,7 @@ const memoryStore = {
 };
 
 async function readAllData() {
+  requireAuth();
   return {
     pages: memoryStore.pages,
     contentBlocks: memoryStore.contentBlocks,
@@ -33,6 +41,7 @@ export const getAdminData = createServerFn({ method: "POST" })
 export const savePage = createServerFn({ method: "POST" })
   .validator((data: { page: any }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const pages = memoryStore.pages;
     const existingIndex = pages.findIndex((p: any) => p.id === data.page.id);
     
@@ -49,6 +58,7 @@ export const savePage = createServerFn({ method: "POST" })
 export const deletePage = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     memoryStore.pages = memoryStore.pages.filter((p: any) => p.id !== data.id);
     return { success: true };
   });
@@ -56,6 +66,7 @@ export const deletePage = createServerFn({ method: "POST" })
 export const clonePage = createServerFn({ method: "POST" })
   .validator((data: { id: string; slug: string; title_en: string; title_es: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const pages = memoryStore.pages;
     const page = pages.find((p: any) => p.id === data.id);
     
@@ -76,6 +87,7 @@ export const clonePage = createServerFn({ method: "POST" })
 export const saveDropoff = createServerFn({ method: "POST" })
   .validator((data: { dropoff: any }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const dropoffs = memoryStore.dropoffs;
     const existingIndex = dropoffs.findIndex((d: any) => d.id === data.dropoff.id);
     
@@ -92,6 +104,7 @@ export const saveDropoff = createServerFn({ method: "POST" })
 export const cloneDropoff = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const dropoffs = memoryStore.dropoffs;
     const dropoff = dropoffs.find((d: any) => d.id === data.id);
     
@@ -110,6 +123,7 @@ export const cloneDropoff = createServerFn({ method: "POST" })
 export const saveVolunteerNeed = createServerFn({ method: "POST" })
   .validator((data: { need: any }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const needs = memoryStore.volunteerNeeds;
     const existingIndex = needs.findIndex((n: any) => n.id === data.need.id);
     
@@ -126,6 +140,7 @@ export const saveVolunteerNeed = createServerFn({ method: "POST" })
 export const cloneVolunteerNeed = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const needs = memoryStore.volunteerNeeds;
     const need = needs.find((n: any) => n.id === data.id);
     
@@ -145,6 +160,7 @@ export const cloneVolunteerNeed = createServerFn({ method: "POST" })
 export const saveDonationMethod = createServerFn({ method: "POST" })
   .validator((data: { method: any }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const methods = memoryStore.donationMethods;
     const existingIndex = methods.findIndex((m: any) => m.id === data.method.id);
     
@@ -161,6 +177,7 @@ export const saveDonationMethod = createServerFn({ method: "POST" })
 export const cloneDonationMethod = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const methods = memoryStore.donationMethods;
     const method = methods.find((m: any) => m.id === data.id);
     
@@ -180,6 +197,7 @@ export const cloneDonationMethod = createServerFn({ method: "POST" })
 export const deleteDropoff = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     memoryStore.dropoffs = memoryStore.dropoffs.filter((d: any) => d.id !== data.id);
     return { success: true };
   });
@@ -187,6 +205,7 @@ export const deleteDropoff = createServerFn({ method: "POST" })
 export const deleteVolunteerNeed = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     memoryStore.volunteerNeeds = memoryStore.volunteerNeeds.filter((n: any) => n.id !== data.id);
     return { success: true };
   });
@@ -194,6 +213,7 @@ export const deleteVolunteerNeed = createServerFn({ method: "POST" })
 export const deleteDonationMethod = createServerFn({ method: "POST" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     memoryStore.donationMethods = memoryStore.donationMethods.filter((m: any) => m.id !== data.id);
     return { success: true };
   });
@@ -201,6 +221,7 @@ export const deleteDonationMethod = createServerFn({ method: "POST" })
 export const saveContentBlock = createServerFn({ method: "POST" })
   .validator((data: { block: any }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     const blocks = memoryStore.contentBlocks;
     const key = data.block.key;
     
@@ -216,6 +237,7 @@ export const saveContentBlock = createServerFn({ method: "POST" })
 export const deleteContentBlock = createServerFn({ method: "POST" })
   .validator((data: { key: string }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     delete memoryStore.contentBlocks[data.key];
     return { success: true };
   });
@@ -223,6 +245,7 @@ export const deleteContentBlock = createServerFn({ method: "POST" })
 export const reorderItems = createServerFn({ method: "POST" })
   .validator((data: { type: string; items: any[] }) => data)
   .handler(async ({ data }) => {
+    requireAuth();
     (memoryStore as any)[data.type] = data.items;
     return { success: true };
   });

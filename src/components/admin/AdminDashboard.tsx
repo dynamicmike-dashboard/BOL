@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { 
-  LayoutDashboard, FileText, MapPin, Users, Heart, 
+  FileText, MapPin, Users, Heart, 
   Settings, Layers, Image as ImageIcon,
   Trash2, Edit, Copy, Save, X, ChevronDown, Plus,
-  Eye, EyeOff, Lock, LogOut, 
   ArrowUpDown, Menu, X as XIcon, ChevronDown as ChevronDown2, 
   Copy as CopyIcon, Trash2 as Trash2Icon, Edit as EditIcon, Save as SaveIcon, X as XIcon2,
   ArrowUpDown as ArrowUpDown2, Menu as MenuIcon
@@ -25,14 +24,15 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { 
-  getAdminData,
-  savePage, deletePage, clonePage,
-  saveDropoff, deleteDropoff, cloneDropoff,
-  saveVolunteerNeed, deleteVolunteerNeed, cloneVolunteerNeed,
-  saveDonationMethod, deleteDonationMethod, cloneDonationMethod,
-  saveContentBlock, deleteContentBlock,
-} from "@/routes/admin/api/data";
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+  const res = await fetch(`/api/admin${path}`, {
+    ...options,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  return res.json();
+}
 
 interface PageData {
   id: string;
@@ -482,7 +482,7 @@ export function AdminDashboard() {
     // Load data from API
     const loadData = async () => {
       try {
-        const data = await getAdminData();
+        const data = await apiFetch("/data");
         if (data.pages) setPages(data.pages);
         if (data.dropoffs) setDropoffs(data.dropoffs);
         if (data.volunteerNeeds) setVolunteers(data.volunteerNeeds);
@@ -510,56 +510,31 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-primary">Admin Panel</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <a href="/" className="text-sm text-muted-foreground hover:text-foreground">
-              ← View Site
-            </a>
-            <button
-              onClick={() => {
-                document.cookie = "bol_admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.href = "/admin";
-              }}
-              className="rounded-full border bg-background px-4 py-2 text-sm font-medium transition hover:bg-accent"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-      <main className="container mx-auto py-6 px-4 max-w-7xl">
-        <div className="mb-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="pages">Pages</TabsTrigger>
-              <TabsTrigger value="dropoffs">Drop-off Points</TabsTrigger>
-              <TabsTrigger value="volunteer">Volunteer Needs</TabsTrigger>
-              <TabsTrigger value="donations">Donations</TabsTrigger>
-              <TabsTrigger value="blocks">Content Blocks</TabsTrigger>
-            </TabsList>
-            <TabsContent value="pages">
-              <AdminPages pages={pages} setPages={setPages} onPageChange={setPages} />
-            </TabsContent>
-            <TabsContent value="dropoffs">
-              <AdminDropoffs dropoffs={dropoffs} setDropoffs={setDropoffs} />
-            </TabsContent>
-            <TabsContent value="volunteer">
-              <AdminVolunteers volunteers={volunteers} setVolunteers={setVolunteers} />
-            </TabsContent>
-            <TabsContent value="donations">
-              <AdminDonations donations={donations} setDonations={setDonations} />
-            </TabsContent>
-            <TabsContent value="blocks">
-              <AdminBlocks blocks={blocks} setBlocks={setBlocks} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
+    <div className="mb-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="pages">Pages</TabsTrigger>
+          <TabsTrigger value="dropoffs">Drop-off Points</TabsTrigger>
+          <TabsTrigger value="volunteer">Volunteer Needs</TabsTrigger>
+          <TabsTrigger value="donations">Donations</TabsTrigger>
+          <TabsTrigger value="blocks">Content Blocks</TabsTrigger>
+        </TabsList>
+        <TabsContent value="pages">
+          <AdminPages pages={pages} setPages={setPages} onPageChange={setPages} />
+        </TabsContent>
+        <TabsContent value="dropoffs">
+          <AdminDropoffs dropoffs={dropoffs} setDropoffs={setDropoffs} />
+        </TabsContent>
+        <TabsContent value="volunteer">
+          <AdminVolunteers volunteers={volunteers} setVolunteers={setVolunteers} />
+        </TabsContent>
+        <TabsContent value="donations">
+          <AdminDonations donations={donations} setDonations={setDonations} />
+        </TabsContent>
+        <TabsContent value="blocks">
+          <AdminBlocks blocks={blocks} setBlocks={setBlocks} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
