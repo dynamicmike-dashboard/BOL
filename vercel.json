@@ -3,9 +3,12 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "regions": ["iad1"],
+  "functions": {
+    "api/_server/**/*.js": { "maxDuration": 30 }
+  },
   "rewrites": [
     { "source": "/api/admin/(.*)", "destination": "/api/admin/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/api/_server/server.js" }
   ],
   "outputDirectory": "dist/client"
 }
