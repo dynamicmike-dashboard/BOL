@@ -4,11 +4,11 @@
   "installCommand": "npm install",
   "regions": ["iad1"],
   "functions": {
-    "api/_server/server.js": { "maxDuration": 30 }
+    "api/index.js": { "maxDuration": 30 }
   },
   "rewrites": [
     { "source": "/api/admin/(.*)", "destination": "/api/admin/$1" },
-    { "source": "/(.*)", "destination": "/api/_server/server.js" }
+    { "source": "/(.*)", "destination": "/api/index.js" }
   ],
   "outputDirectory": "."
 }
