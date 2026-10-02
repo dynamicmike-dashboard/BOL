@@ -9,10 +9,8 @@ export default defineConfig({
   plugins: [
     tanstackStart({
       server: { entry: "server" },
-      // Enable Vercel-compatible output
-      target: "vercel",
-      // Use Vinxi's vercel preset
-      presets: ["vercel"],
+      // Disable SSR - deploy as SPA
+      ssr: false,
     }),
     react(),
     tailwindcss(),

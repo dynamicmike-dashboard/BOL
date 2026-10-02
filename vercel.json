@@ -3,12 +3,9 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "regions": ["iad1"],
-  "functions": {
-    "api/index.mjs": { "maxDuration": 30 }
-  },
   "rewrites": [
     { "source": "/api/admin/(.*)", "destination": "/api/admin/$1" },
-    { "source": "/(.*)", "destination": "/api/index.mjs" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "outputDirectory": "dist/client"
 }
