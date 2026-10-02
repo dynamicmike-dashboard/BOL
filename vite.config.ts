@@ -84,5 +84,6 @@ export default defineConfig({
     rollupOptions: {
       external: ["vinxi/http"],
     },
+    outDir: "dist",
   },
 });
